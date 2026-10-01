@@ -459,13 +459,29 @@ h1{
                 timeString = "gerade eben";
             }
             
-            let content = `<b>${data.user || 'Anonym'}:</b> ${data.text || ''}`;
+            // SICHERER FIX: Trennung von Benutzer und Text via textContent statt unsicherem innerHTML
+            const boldUser = document.createElement("strong");
+            boldUser.textContent = (data.user || 'Anonym') + ": ";
+            div.appendChild(boldUser);
+
+            const textNode = document.createElement("span");
+            textNode.textContent = data.text || '';
+            div.appendChild(textNode);
+
             if (data.imageUrl) {
-                content += `<br><img src="${data.imageUrl}" alt="Bild">`;
+                const br = document.createElement("br");
+                div.appendChild(br);
+                const img = document.createElement("img");
+                img.src = data.imageUrl;
+                img.alt = "Bild";
+                div.appendChild(img);
             }
-            content += `<span class="msg-time">${timeString}</span>`;
             
-            div.innerHTML = content;
+            const timeSpan = document.createElement("span");
+            timeSpan.className = "msg-time";
+            timeSpan.textContent = timeString;
+            div.appendChild(timeSpan);
+            
             list.appendChild(div);
         });
         list.scrollTop = list.scrollHeight;
