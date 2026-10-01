@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#070b14">
 <title>Wartungsarbeiten • Maintenance</title>
 <style>
@@ -27,7 +27,7 @@ body{
   align-items:center;
   justify-content:center;
   overflow-x:hidden;
-  padding:24px;
+  padding:16px;
   margin:0;
   color:var(--text);
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -46,10 +46,10 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
 @keyframes float{to{transform:translate(30px,24px) scale(1.08)}}
 
 .shell{
-  width:min(100%,680px);
+  width:min(100%, 680px);
   position:relative;
   padding:1px;
-  border-radius:30px;
+  border-radius:24px;
   background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.035));
   box-shadow:0 30px 100px rgba(0,0,0,.5);
 }
@@ -58,18 +58,17 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   width:100%;
   overflow:hidden;
   border:1px solid rgba(255,255,255,.07);
-  border-radius:29px;
-  padding:26px;
+  border-radius:23px;
+  padding:20px;
   text-align:center;
   background:linear-gradient(180deg,rgba(15,23,42,.88),rgba(8,13,24,.88));
   backdrop-filter:blur(24px);
 }
 
 .hero-icon{
-  width:148px;height:148px;
-  margin:0 auto 20px;
+  width:110px;height:110px;
+  margin:0 auto 16px;
   position:relative;
-  left:0;right:0;
   display:grid;place-items:center;
 }
 .hero-icon:before{
@@ -77,99 +76,101 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   border-radius:50%;animation:spin 18s linear infinite
 }
 .hero-icon:after{
-  content:"";position:absolute;inset:18px;border-radius:50%;
+  content:"";position:absolute;inset:15px;border-radius:50%;
   background:radial-gradient(circle,rgba(56,189,248,.11),transparent 68%);
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-.svg{width:118px;height:118px;position:relative;z-index:1}
+.svg{width:90px;height:90px;position:relative;z-index:1}
 .steam{animation:steam 2.7s ease-in-out infinite}
 .steam.two{animation-delay:.7s}
 @keyframes steam{0%,100%{opacity:.2;transform:translateY(2px)}50%{opacity:.9;transform:translateY(-7px)}}
 
 .badge{
-  display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;
+  display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;
   background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.2);
-  color:#fbbf24;font-size:.76rem;font-weight:750;margin-bottom:15px
+  color:#fbbf24;font-size:0.75rem;font-weight:750;margin-bottom:12px
 }
-.badge i{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 1.7s infinite}
-@keyframes pulse{50%{box-shadow:0 0 0 7px rgba(245,158,11,0)}}
+.badge i{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pulse 1.7s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
 
 h1{
   width:100%;
   text-align:center;
-  font-size:clamp(1.55rem,5vw,2.1rem);
-  letter-spacing:-.045em;
-  line-height:1.1;
-  margin:0 auto 13px;
+  font-size: clamp(1.3rem, 4.5vw, 1.9rem);
+  letter-spacing:-.03em;
+  line-height:1.2;
+  margin:0 auto 10px;
 }
 .lead{
   width:100%;
-  max-width:560px;
+  max-width:520px;
   margin:0 auto;
   text-align:center;
   color:var(--muted);
-  font-size:.94rem;
-  line-height:1.7;
+  font-size: clamp(0.85rem, 3vw, 0.95rem);
+  line-height:1.6;
 }
 
 .status-grid{
   width:100%;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
+  gap:8px;
   text-align:left;
-  margin:26px auto 20px;
+  margin:20px auto 16px;
 }
 .status-card{
-  padding:15px;border:1px solid var(--line);border-radius:16px;background:var(--panel-2)
+  padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)
 }
-.status-card small{display:block;color:#64748b;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;font-weight:750;margin-bottom:7px}
-.status-card strong{display:block;font-size:.84rem;color:#e2e8f0;line-height:1.35}
+.status-card small{display:block;color:#64748b;font-size:0.65rem;text-transform:uppercase;letter-spacing:.08em;font-weight:750;margin-bottom:4px}
+.status-card strong{display:block;font-size:0.8rem;color:#e2e8f0;line-height:1.3}
 .status-card .amber{color:#fbbf24}
 
 .note{
   width:100%;
   display:flex;
-  gap:12px;
+  gap:10px;
   align-items:flex-start;
   text-align:left;
-  padding:14px 15px;border-radius:15px;background:rgba(56,189,248,.045);
-  border:1px solid rgba(56,189,248,.12);color:#a5b4fc;font-size:.78rem;line-height:1.55
+  padding:12px;border-radius:12px;background:rgba(56,189,248,.045);
+  border:1px solid rgba(56,189,248,.12);color:#a5b4fc;font-size:0.75rem;line-height:1.5
 }
-.note-icon{flex:0 0 auto;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:rgba(56,189,248,.1);color:var(--cyan)}
+.note-icon{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:rgba(56,189,248,.1);color:var(--cyan)}
 
 .footer{
   width:100%;
-  margin:22px auto 0;
-  padding-top:18px;
+  margin:16px auto 0;
+  padding-top:14px;
   border-top:1px solid var(--line);
   color:#64748b;
-  font-size:.76rem;
-  line-height:1.7;
+  font-size:0.72rem;
+  line-height:1.6;
   text-align:center;
 }
 .footer strong{color:#cbd5e1}
 
-/* Etwas kompakteres Chat-Widget unten rechts, perfekt skalierbar für PC & Handy */
+/* Universales, perfekt skalierendes Chat-Widget für ALLE Handys (iOS & Android) */
 .chat-widget {
   position: fixed;
-  bottom: 16px;
-  right: 16px;
-  width: 290px;
-  max-height: 380px;
-  background: rgba(15, 23, 42, 0.95);
+  bottom: max(12px, env(safe-area-inset-bottom));
+  right: 12px;
+  left: auto;
+  width: min(92vw, 320px);
+  max-height: 400px;
+  background: rgba(15, 23, 42, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
   overflow: hidden;
   z-index: 1000;
+  backdrop-filter: blur(12px);
 }
 .chat-header {
   background: #1e293b;
-  padding: 8px 12px;
-  font-size: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
   font-weight: 600;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
@@ -177,20 +178,21 @@ h1{
   align-items: center;
 }
 .chat-messages {
-  height: 200px;
+  height: 210px;
   overflow-y: auto;
-  padding: 8px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   font-size: 12px;
 }
 .message {
   background: #334155;
-  padding: 6px 9px;
-  border-radius: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
   max-width: 85%;
   word-break: break-word;
+  color: #f8fafc;
 }
 .message img {
   max-width: 100%;
@@ -199,19 +201,20 @@ h1{
 }
 .chat-input-area {
   display: flex;
-  padding: 6px;
+  padding: 8px;
   background: #1e293b;
-  gap: 5px;
+  gap: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .chat-input-area input[type="text"] {
   flex: 1;
   background: #0f172a;
   border: 1px solid #475569;
-  border-radius: 6px;
-  padding: 6px;
+  border-radius: 8px;
+  padding: 8px;
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
+  outline: none;
 }
 .chat-input-area input[type="file"] {
   display: none;
@@ -220,22 +223,22 @@ h1{
   background: #3b82f6;
   color: white;
   border: none;
-  padding: 6px 9px;
-  border-radius: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .file-upload-btn:hover, .send-btn:hover { background: #2563eb; }
 
-/* Kleines Popup zur Namenseingabe */
+/* Namens-Popup */
 .name-modal {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(11, 15, 25, 0.85);
+  background: rgba(11, 15, 25, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -244,44 +247,49 @@ h1{
 .name-modal-content {
   background: #1e293b;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 16px;
-  border-radius: 10px;
+  padding: 18px;
+  border-radius: 12px;
   text-align: center;
-  width: 80%;
-  max-width: 240px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  width: 85%;
+  max-width: 260px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
 }
 .name-modal-content input {
-  width: 90%;
+  width: 100%;
   background: #0f172a;
   border: 1px solid #475569;
-  border-radius: 6px;
-  padding: 6px;
+  border-radius: 8px;
+  padding: 8px;
   color: #fff;
   text-align: center;
-  font-size: 12px;
-  margin: 8px 0;
+  font-size: 13px;
+  margin: 10px 0;
+  outline: none;
 }
 .name-modal-content button {
   background: #3b82f6;
   color: #fff;
   border: none;
-  padding: 5px 12px;
-  border-radius: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 11px;
+  font-size: 12px;
 }
 .hidden { display: none !important; }
 .change-name { font-size: 10px; color: #94a3b8; cursor: pointer; }
 .change-name:hover { color: #fff; text-decoration: underline; }
 
-/* Optimierte Darstellung auf Smartphones (Android & iOS) */
-@media(max-width:480px){
-  body{padding:10px}
-  .chat-widget{width:94%;right:3%;bottom:10px;max-height:340px}
-  .chat-messages{height:160px}
+/* Spezielles Design für ganz kleine Smartphones (z.B. iPhone SE oder ältere Androids) */
+@media(max-width:360px){
+  body{padding:8px}
+  .card{padding:14px}
+  .hero-icon{width:90px;height:90px;margin-bottom:12px}
+  .svg{width:74px;height:74px}
+  .chat-widget{width:96%;right:2%;bottom:max(8px, env(safe-area-inset-bottom));max-height:320px}
+  .chat-messages{height:150px}
 }
+
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{animation:none!important;scroll-behavior:auto!important}
 }
@@ -333,7 +341,6 @@ h1{
 </section>
 </main>
 
-<!-- Live-Chat Widget unten rechts -->
 <div class="chat-widget">
     <div class="chat-header">
         <span>💬 Live-Testchat</span>
@@ -351,14 +358,13 @@ h1{
 
     <div class="name-modal hidden" id="nameModal">
         <div class="name-modal-content">
-            <p style="margin: 0; font-size: 11px; color: #cbd5e1;">Wie möchtest du im Chat heißen?</p>
+            <p style="margin: 0; font-size: 12px; color: #cbd5e1;">Wie möchtest du im Chat heißen?</p>
             <input type="text" id="popupNameInput" placeholder="Dein Name...">
             <button onclick="saveNameFromPopup()">Weiter</button>
         </div>
     </div>
 </div>
 
-<!-- Firebase Logik -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
