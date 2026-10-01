@@ -28,7 +28,7 @@ body{
   justify-content:center;
   overflow-x:hidden;
   padding:16px;
-  padding-bottom: 140px; /* Platzhalter unten, damit man komplett durchscrollen kann */
+  padding-bottom: 120px;
   margin:0;
   color:var(--text);
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -150,28 +150,40 @@ h1{
 }
 .footer strong{color:#cbd5e1}
 
-/* Transparentes, durchsichtiges Chat-Widget mit starkem Glas-Effekt */
+/* PERFEKTE RESPONSIVE PLATZIERUNG: PC vs. HANDY */
 .chat-widget {
   position: fixed;
-  bottom: max(10px, env(safe-area-inset-bottom));
-  right: 12px;
-  left: 12px;
-  max-width: 400px;
-  margin: 0 auto;
-  background: rgba(15, 23, 42, 0.75); /* Transparentes Dunkelblau */
+  bottom: 20px;
+  right: 20px;
+  width: 340px;
+  max-height: 420px;
+  background: rgba(15, 23, 42, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.6);
   overflow: hidden;
   z-index: 1000;
-  backdrop-filter: blur(16px); /* Starker Milchglas-Effekt zum Durchschauen */
+  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
+
+/* Speziell für Handys (Bildschirme kleiner als 768px): Unten zentriert & transparent mit Scrollmöglichkeit */
+@media(max-width: 768px) {
+  .chat-widget {
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+    max-height: 350px;
+  }
+}
+
 .chat-header {
-  background: rgba(30, 41, 59, 0.85);
-  padding: 8px 12px;
+  background: rgba(30, 41, 59, 0.9);
+  padding: 10px 14px;
   font-size: 12px;
   font-weight: 600;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -180,9 +192,9 @@ h1{
   align-items: center;
 }
 .chat-messages {
-  height: 160px;
+  height: 180px;
   overflow-y: auto;
-  padding: 8px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -190,7 +202,7 @@ h1{
 }
 .message {
   background: rgba(51, 65, 85, 0.85);
-  padding: 6px 8px;
+  padding: 6px 10px;
   border-radius: 8px;
   max-width: 85%;
   word-break: break-word;
@@ -203,8 +215,8 @@ h1{
 }
 .chat-input-area {
   display: flex;
-  padding: 6px;
-  background: rgba(30, 41, 59, 0.85);
+  padding: 8px;
+  background: rgba(30, 41, 59, 0.9);
   gap: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -213,7 +225,7 @@ h1{
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  padding: 6px;
+  padding: 8px;
   color: #fff;
   font-size: 12px;
   outline: none;
@@ -225,7 +237,7 @@ h1{
   background: #3b82f6;
   color: white;
   border: none;
-  padding: 6px 10px;
+  padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
@@ -399,7 +411,7 @@ h1{
     window.requestNameChange = function() {
         document.getElementById("nameModal").classList.remove("hidden");
         document.getElementById("popupNameInput").value = chatUser || "";
-        document.getElementById("popupNameInput").popupNameInput?.focus();
+        document.getElementById("popupNameInput").focus();
     };
 
     window.saveNameFromPopup = function() {
@@ -443,7 +455,6 @@ h1{
     };
 
     async function sendMessage() {
-        TheInput = document.getElementById("messageInput");
         const input = document.getElementById("messageInput");
         const text = input.value.trim();
         if (!text) return;
@@ -483,12 +494,6 @@ h1{
             }
         };
         reader.readAsDataURL(file);
-    };
-
-    window.handleNicknameKeyPress = function(e) {
-        if (e.key === 'Enter') {
-            saveNameFromPopup();
-        }
     };
 
     window.handleKeyPress = function(e) {
