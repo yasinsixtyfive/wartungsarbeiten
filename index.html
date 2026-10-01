@@ -400,6 +400,9 @@ h1{
 
     <div class="chat-messages" id="messagesList"></div>
 
+    <!-- HIER NEU: Anzeige für tippende Benutzer -->
+    <div id="typingIndicator" style="font-size: 11px; color: #94a3b8; padding: 4px 12px; font-style: italic; min-height: 20px; background: rgba(15, 23, 42, 0.4);"></div>
+
     <div class="chat-input-area">
         <input type="text" id="messageInput" placeholder="Nachricht schreiben..." onfocus="checkNameBeforeWriting()" onkeypress="handleKeyPress(event)">
         <label class="file-upload-btn" for="imageInput" title="Bild hochladen">📷</label>
@@ -437,16 +440,23 @@ h1{
 
     let chatUser = localStorage.getItem("yasin_chat_username");
     let heartbeatInterval = null;
+    let typingTimeout = null;
 
     window.onload = function() {
         updateUserLabel();
         if (chatUser) {
             startHeartbeat();
         }
+
+        // Lauscht auf Eingaben im Textfeld für die "schreibt..." Logik
+        const msgInput = document.getElementById("messageInput");
+        if (msgInput) {
+            msgInput.addEventListener("input", window.handleTypingEvent);
+        }
     };
 
     // ==========================================
-    // ONLINE-STATUS TRACKING (HEARTBEAT)
+    // ONLINE-STATUS & TIPP-STATUS TRACKING
     // ==========================================
     function startHeartbeat() {
         if (!chatUser) return;
@@ -467,6 +477,28 @@ h1{
         sendHeartbeat();
         heartbeatInterval = setInterval(sendHeartbeat, 20000);
     }
+
+    async function setTypingStatus(isTyping) {
+        if (!chatUser) return;
+        try {
+            await setDoc(doc(db, "onlineUsers", chatUser), {
+                isTyping: isTyping
+            }, { merge: true });
+        } catch (e) {
+            console.error("Fehler beim Aktualisieren des Tipp-Status:", e);
+        }
+    }
+
+    window.handleTypingEvent = function() {
+        if (!chatUser) return;
+
+        if (typingTimeout) clearTimeout(typingTimeout);
+        setTypingStatus(true);
+
+        typingTimeout = setTimeout(() => {
+            setTypingStatus(false);
+        }, 3000);
+    };
 
     window.addEventListener("beforeunload", () => {
         if (chatUser) {
@@ -533,7 +565,6 @@ h1{
                 timeString = "gerade eben";
             }
             
-            // SICHERER FIX: Trennung von Benutzer und Text via textContent statt unsicherem innerHTML
             const boldUser = document.createElement("strong");
             boldUser.textContent = (data.user || 'Anonym') + ": ";
             div.appendChild(boldUser);
@@ -565,24 +596,48 @@ h1{
     onSnapshot(onlineQuery, (snapshot) => {
         const now = Date.now();
         const activeUsers = [];
+        const typingUsers = [];
 
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
+            let isOnline = false;
+
             if (data.lastActive && data.lastActive.toDate) {
                 const lastActiveTime = data.lastActive.toDate().getTime();
                 if (now - lastActiveTime < 40000) {
+                    isOnline = true;
                     activeUsers.push(data.user);
                 }
             } else {
+                isOnline = true;
                 activeUsers.push(data.user);
+            }
+
+            if (isOnline && data.isTyping && data.user !== chatUser) {
+                typingUsers.push(data.user);
             }
         });
 
+        // 1. Header-Anzeige aktualisieren
         const headerTitle = document.querySelector(".chat-header span:first-child");
         if (activeUsers.length > 0) {
             headerTitle.innerHTML = `💬 Live-Testchat <span style="color: #34d399; font-size: 10px; margin-left: 6px; font-weight: normal;">● ${activeUsers.length} online (${activeUsers.join(", ")})</span>`;
         } else {
             headerTitle.innerHTML = `💬 Live-Testchat`;
+        }
+
+        // 2. Tipp-Anzeige im Interface rendern
+        const typingIndicator = document.getElementById("typingIndicator");
+        if (typingIndicator) {
+            if (typingUsers.length > 0) {
+                if (typingUsers.length === 1) {
+                    typingIndicator.textContent = `✍️ ${typingUsers[0]} schreibt...`;
+                } else {
+                    typingIndicator.textContent = `✍️ Mehrere Personen schreiben...`;
+                }
+            } else {
+                typingIndicator.textContent = "";
+            }
         }
     });
 
@@ -601,6 +656,9 @@ h1{
         const input = document.getElementById("messageInput");
         const text = input.value.trim();
         if (!text) return;
+
+        if (typingTimeout) clearTimeout(typingTimeout);
+        setTypingStatus(false); // Tipp-Status sofort beenden beim Senden
 
         try {
             await addDoc(collection(db, "chatMessages"), {
