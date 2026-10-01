@@ -400,7 +400,7 @@ h1{
 
     <div class="chat-messages" id="messagesList"></div>
 
-    <!-- HIER NEU: Anzeige für tippende Benutzer -->
+    <!-- Anzeige für tippende Benutzer -->
     <div id="typingIndicator" style="font-size: 11px; color: #94a3b8; padding: 4px 12px; font-style: italic; min-height: 20px; background: rgba(15, 23, 42, 0.4);"></div>
 
     <div class="chat-input-area">
@@ -448,7 +448,6 @@ h1{
             startHeartbeat();
         }
 
-        // Lauscht auf Eingaben im Textfeld für die "schreibt..." Logik
         const msgInput = document.getElementById("messageInput");
         if (msgInput) {
             msgInput.addEventListener("input", window.handleTypingEvent);
@@ -618,7 +617,6 @@ h1{
             }
         });
 
-        // 1. Header-Anzeige aktualisieren
         const headerTitle = document.querySelector(".chat-header span:first-child");
         if (activeUsers.length > 0) {
             headerTitle.innerHTML = `💬 Live-Testchat <span style="color: #34d399; font-size: 10px; margin-left: 6px; font-weight: normal;">● ${activeUsers.length} online (${activeUsers.join(", ")})</span>`;
@@ -626,7 +624,6 @@ h1{
             headerTitle.innerHTML = `💬 Live-Testchat`;
         }
 
-        // 2. Tipp-Anzeige im Interface rendern
         const typingIndicator = document.getElementById("typingIndicator");
         if (typingIndicator) {
             if (typingUsers.length > 0) {
@@ -658,7 +655,7 @@ h1{
         if (!text) return;
 
         if (typingTimeout) clearTimeout(typingTimeout);
-        setTypingStatus(false); // Tipp-Status sofort beenden beim Senden
+        setTypingStatus(false);
 
         try {
             await addDoc(collection(db, "chatMessages"), {
