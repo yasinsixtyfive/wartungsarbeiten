@@ -310,6 +310,32 @@ h1{
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{animation:none!important;scroll-behavior:auto!important}
 }
+
+/* ================================
+   MOBILE SCROLL FIX
+   ================================ */
+@media (max-width: 768px) {
+  html {
+    height: auto;
+    min-height: 100%;
+  }
+
+  body {
+    min-height: 100svh;
+    height: auto;
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 24px 12px 180px 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+}
 </style>
 </head>
 <body>
@@ -459,13 +485,29 @@ h1{
                 timeString = "gerade eben";
             }
             
-            let content = `<b>${data.user || 'Anonym'}:</b> ${data.text || ''}`;
+            // SICHERER FIX: Trennung von Benutzer und Text via textContent statt unsicherem innerHTML
+            const boldUser = document.createElement("strong");
+            boldUser.textContent = (data.user || 'Anonym') + ": ";
+            div.appendChild(boldUser);
+
+            const textNode = document.createElement("span");
+            textNode.textContent = data.text || '';
+            div.appendChild(textNode);
+
             if (data.imageUrl) {
-                content += `<br><img src="${data.imageUrl}" alt="Bild">`;
+                const br = document.createElement("br");
+                div.appendChild(br);
+                const img = document.createElement("img");
+                img.src = data.imageUrl;
+                img.alt = "Bild";
+                div.appendChild(img);
             }
-            content += `<span class="msg-time">${timeString}</span>`;
             
-            div.innerHTML = content;
+            const timeSpan = document.createElement("span");
+            timeSpan.className = "msg-time";
+            timeSpan.textContent = timeString;
+            div.appendChild(timeSpan);
+            
             list.appendChild(div);
         });
         list.scrollTop = list.scrollHeight;
