@@ -418,7 +418,7 @@ h1{
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -436,11 +436,47 @@ h1{
     const db = getFirestore(app);
 
     let chatUser = localStorage.getItem("yasin_chat_username");
+    let heartbeatInterval = null;
 
     window.onload = function() {
         updateUserLabel();
+        if (chatUser) {
+            startHeartbeat();
+        }
     };
 
+    // ==========================================
+    // ONLINE-STATUS TRACKING (HEARTBEAT)
+    // ==========================================
+    function startHeartbeat() {
+        if (!chatUser) return;
+        
+        if (heartbeatInterval) clearInterval(heartbeatInterval);
+
+        async function sendHeartbeat() {
+            try {
+                await setDoc(doc(db, "onlineUsers", chatUser), {
+                    user: chatUser,
+                    lastActive: serverTimestamp()
+                }, { merge: true });
+            } catch (e) {
+                console.error("Fehler beim Online-Status-Update:", e);
+            }
+        }
+
+        sendHeartbeat();
+        heartbeatInterval = setInterval(sendHeartbeat, 20000);
+    }
+
+    window.addEventListener("beforeunload", () => {
+        if (chatUser) {
+            deleteDoc(doc(db, "onlineUsers", chatUser));
+        }
+    });
+
+    // ==========================================
+    // USER INTERFACE & MODAL LOGIK
+    // ==========================================
     function updateUserLabel() {
         const label = document.getElementById("userNameLabel");
         if (chatUser) {
@@ -473,11 +509,15 @@ h1{
         localStorage.setItem("yasin_chat_username", chatUser);
         document.getElementById("nameModal").classList.add("hidden");
         updateUserLabel();
+        startHeartbeat();
         document.getElementById("messageInput").focus();
     };
 
-    const q = query(collection(db, "chatMessages"), orderBy("createdAt", "asc"));
-    onSnapshot(q, (snapshot) => {
+    // ==========================================
+    // REALTIME LISTENERS (NACHRICHTEN & ONLINE-USER)
+    // ==========================================
+    const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "asc"));
+    onSnapshot(chatQuery, (snapshot) => {
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
         snapshot.forEach((doc) => {
@@ -521,6 +561,34 @@ h1{
         list.scrollTop = list.scrollHeight;
     });
 
+    const onlineQuery = query(collection(db, "onlineUsers"));
+    onSnapshot(onlineQuery, (snapshot) => {
+        const now = Date.now();
+        const activeUsers = [];
+
+        snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data.lastActive && data.lastActive.toDate) {
+                const lastActiveTime = data.lastActive.toDate().getTime();
+                if (now - lastActiveTime < 40000) {
+                    activeUsers.push(data.user);
+                }
+            } else {
+                activeUsers.push(data.user);
+            }
+        });
+
+        const headerTitle = document.querySelector(".chat-header span:first-child");
+        if (activeUsers.length > 0) {
+            headerTitle.innerHTML = `💬 Live-Testchat <span style="color: #34d399; font-size: 10px; margin-left: 6px; font-weight: normal;">● ${activeUsers.length} online (${activeUsers.join(", ")})</span>`;
+        } else {
+            headerTitle.innerHTML = `💬 Live-Testchat`;
+        }
+    });
+
+    // ==========================================
+    // CHAT SENDEN-LOGIK & BILD-UPLOAD
+    // ==========================================
     window.checkNameAndSend = function() {
         if (!chatUser) {
             checkNameBeforeWriting();
