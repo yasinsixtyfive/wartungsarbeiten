@@ -421,7 +421,7 @@ h1{
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -441,6 +441,13 @@ h1{
     let chatUser = localStorage.getItem("yasin_chat_username");
     let heartbeatInterval = null;
     let typingTimeout = null;
+
+    // Hilfsfunktion: Erkennt YouTube-Links
+    function getYouTubeEmbedUrl(text) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = text.match(regExp);
+        return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+    }
 
     window.onload = function() {
         updateUserLabel();
@@ -536,6 +543,9 @@ h1{
             alert("Bitte gib einen Namen ein.");
             return;
         }
+        if (chatUser && chatUser !== val) {
+            deleteDoc(doc(db, "onlineUsers", chatUser)); // Alten Online-Status löschen
+        }
         chatUser = val;
         localStorage.setItem("yasin_chat_username", chatUser);
         document.getElementById("nameModal").classList.add("hidden");
@@ -547,7 +557,7 @@ h1{
     // ==========================================
     // REALTIME LISTENERS (NACHRICHTEN & ONLINE-USER)
     // ==========================================
-    const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "asc"));
+    const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "asc"), limit(50));
     onSnapshot(chatQuery, (snapshot) => {
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
@@ -571,6 +581,21 @@ h1{
             const textNode = document.createElement("span");
             textNode.textContent = data.text || '';
             div.appendChild(textNode);
+
+            // YouTube-Einbettung
+            const ytUrl = getYouTubeEmbedUrl(data.text || '');
+            if (ytUrl) {
+                const iframe = document.createElement("iframe");
+                iframe.src = ytUrl;
+                iframe.style.width = "100%";
+                iframe.style.height = "160px";
+                iframe.style.borderRadius = "8px";
+                iframe.style.marginTop = "8px";
+                iframe.style.border = "none";
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                div.appendChild(iframe);
+            }
 
             if (data.imageUrl) {
                 const br = document.createElement("br");
@@ -639,7 +664,7 @@ h1{
     });
 
     // ==========================================
-    // CHAT SENDEN-LOGIK & BILD-UPLOAD
+    // CHAT SENDEN-LOGIK & BILD-UPLOAD (KOMPIMIERT)
     // ==========================================
     window.checkNameAndSend = function() {
         if (!chatUser) {
@@ -679,19 +704,42 @@ h1{
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = async function(e) {
-            try {
-                await addDoc(collection(db, "chatMessages"), {
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement("canvas");
+                const MAX_WIDTH = 600;
+                const MAX_HEIGHT = 600;
+                let width = img.width;
+                let height = img.height;
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, width, height);
+                const compressedBase64 = canvas.toDataURL("image/jpeg", 0.6);
+
+                addDoc(collection(db, "chatMessages"), {
                     text: "📷 Bild-Upload:",
-                    imageUrl: e.target.result,
+                    imageUrl: compressedBase64,
                     user: chatUser,
                     createdAt: serverTimestamp()
-                });
-            } catch (err) {
-                console.error("Fehler beim Bild-Upload: ", err);
-            }
+                }).catch(err => console.error("Fehler beim Senden des komprimierten Bildes: ", err));
+            };
+            img.src = e.target.result;
         };
         reader.readAsDataURL(file);
+        input.value = "";
     };
 
     window.handleKeyPress = function(e) {
