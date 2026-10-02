@@ -19,6 +19,7 @@
   --blue:#6366f1;
   --amber:#f59e0b;
   --green:#34d399;
+  --red:#ef4444;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;}
@@ -166,8 +167,8 @@ h1{
 }
 .footer strong{color:#cbd5e1}
 
-/* FLOATING CHAT BUBBLE & SCHUBLADE */
-.chat-toggle-btn {
+/* CHAT LAUNCHER BUTTON (Unten rechts, z-index 999) */
+.chat-launcher {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -180,17 +181,18 @@ h1{
   font-size: 13px;
   font-weight: 600;
   box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  z-index: 1000;
+  z-index: 999;
   display: flex;
   align-items: center;
   gap: 8px;
   transition: transform 0.2s ease;
 }
-.chat-toggle-btn:hover { transform: scale(1.05); }
+.chat-launcher:hover { transform: scale(1.05); }
 
+/* CHAT SCHUBLADE (Sitzt oberhalb des Buttons, z-index 1000) */
 .chat-widget {
   position: fixed;
-  bottom: 20px;
+  bottom: 80px;
   right: 20px;
   width: 340px;
   max-height: 440px;
@@ -204,15 +206,17 @@ h1{
   z-index: 1000;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  transform: translateY(20px);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.25s ease;
-}
-.chat-widget.open {
-  transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
+  transform: translateY(0) scale(1);
+  transition: all 0.25s ease;
+}
+
+/* Eingeklappter Zustand */
+.chat-widget.collapsed {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px) scale(0.97);
 }
 
 @media(max-width: 768px) {
@@ -254,15 +258,63 @@ h1{
   word-break: break-word;
   color: #f8fafc;
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.message.deleted-msg {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px dashed rgba(255,255,255,0.08);
+}
+.msg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
 }
 .msg-time {
-  display: block;
+  display: inline-block;
   font-size: 9px;
   color: #94a3b8;
-  text-align: right;
   margin-top: 4px;
   font-weight: 500;
 }
+.delete-btn {
+  background: none;
+  border: none;
+  color: #f87171;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0 4px;
+  font-weight: bold;
+}
+.delete-btn:hover {
+  color: #ef4444;
+}
+
+/* Toast Benachrichtigung */
+.toast-notification {
+  position: fixed;
+  bottom: 85px;
+  right: 20px;
+  background: #1e293b;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 1050;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+.toast-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .chat-input-area {
   display: flex;
   padding: 10px;
@@ -379,7 +431,7 @@ h1{
   </p>
 
   <div class="status-grid">
-    <div class="status-card" onclick="checkOwnerLoginTrigger()" title="Entwickler-Status">
+    <div class="status-card" onclick="checkOwnerLoginTrigger()" title="Entwickler-Status (Klick für Admin-Login)">
       <small>Entwickler-Status</small>
       <strong id="ownerStatusText"><span class="dot amber"></span>Yasin · Kaffeepause</strong>
     </div>
@@ -401,18 +453,18 @@ h1{
 </section>
 </main>
 
-<!-- FLOATING CHAT BUBBLE -->
-<button class="chat-toggle-btn" onclick="toggleChat()">
-  💬 Schreib mir
-</button>
+<!-- TOAST BENACHRICHTIGUNG -->
+<div class="toast-notification" id="toastNotification">🗑️ Nachricht moderiert</div>
 
-<!-- CHAT SCHUBLADE -->
-<div class="chat-widget" id="chatWidget">
+<!-- CHAT LAUNCHER BUTTON -->
+<button class="chat-launcher" id="chatLauncherBtn">💬 Schreib mir</button>
+
+<!-- CHAT SCHUBLADE (Startet mit .collapsed) -->
+<div class="chat-widget collapsed" id="chatWidget" aria-hidden="true">
     <div class="chat-header">
         <span>💬 Schreib mir & Pinnwand</span>
         <div style="display:flex; gap:10px; align-items:center;">
             <span class="change-name" id="userNameLabel" onclick="requestNameChange()" title="Namen ändern"></span>
-            <span onclick="toggleChat()" style="cursor:pointer; font-size:14px; color:#94a3b8;" title="Schließen">✕</span>
         </div>
     </div>
 
@@ -449,12 +501,12 @@ h1{
 </div>
 
 <audio id="countdownAudio" preload="auto">
-    <source src="final-countdown.mp3" type="audio/mpeg">
+    <source src="countdown.mp3" type="audio/mpeg">
 </audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, signInAnonymously, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -486,15 +538,19 @@ h1{
         }
     });
 
-    window.toggleChat = function() {
-        const widget = document.getElementById("chatWidget");
-        widget.classList.toggle("open");
-        if (widget.classList.contains("open")) {
+    // Launcher-Logik exakt nach Vorgabe
+    const chatWidget = document.getElementById("chatWidget");
+    document.getElementById("chatLauncherBtn").addEventListener("click", () => {
+        const zu = chatWidget.classList.contains("collapsed");
+        chatWidget.classList.toggle("collapsed", !zu);
+        chatWidget.setAttribute("aria-hidden", !zu);
+        
+        if (zu) {
             const list = document.getElementById("messagesList");
             list.scrollTop = list.scrollHeight;
             if (chatUser) document.getElementById("messageInput").focus();
         }
-    };
+    });
 
     window.playFinalCountdown = function() {
         const audio = document.getElementById("countdownAudio");
@@ -522,15 +578,18 @@ h1{
                     }
                 }, 100);
             }, 15000);
-        }).catch(e => {});
+        }).catch(e => {
+            console.log("Audio blockiert:", e);
+        });
     };
 
     function sanitizeName(name) {
         return name.replace(/[^a-zA-Z0-9äöüÄÖÜß _-]/g, "").trim().substring(0, 16);
     }
 
+    // YouTube Erkennung (inklusive Shorts)
     function getYouTubeEmbedUrl(text) {
-        const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([^#\&\?\s]{11})/;
+        const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([^#\&\?\s]{11})/;
         const match = text.match(regExp);
         return match ? `https://www.youtube.com/embed/${match[1]}` : null;
     }
@@ -547,10 +606,9 @@ h1{
         }
     });
 
-    // Cleanup-Funktion beim Logout / Unload (Memory-Leak Prevention)
     window.handleOwnerLogout = async function() {
         if (heartbeatInterval) clearInterval(heartbeatInterval);
-        if (typingTimeout) clearTimeout(typingTimeout);
+        if (typingTimeout) clearInterval(typingTimeout);
         isOwner = false;
         try {
             await setDoc(doc(db, "presence", "owner"), { lastActive: new Date(0) }, { merge: true });
@@ -633,6 +691,29 @@ h1{
         statusText.innerHTML = `<span class="dot amber"></span>Yasin · Kaffeepause`;
     });
 
+    // Soft-Delete (Twitch-Mod-Modus)
+    window.deleteMessage = async function(msgId) {
+        try {
+            await updateDoc(doc(db, "chatMessages", msgId), {
+                text: "Nachricht gelöscht",
+                deleted: true
+            });
+            showToast("🗑 Nachricht moderiert");
+        } catch (e) {
+            console.error("Moderations-Fehler:", e);
+            alert("Fehler beim Moderieren. Bist du als Owner angemeldet?");
+        }
+    };
+
+    function showToast(text) {
+        const toast = document.getElementById("toastNotification");
+        toast.textContent = text;
+        toast.classList.add("show");
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 2500);
+    }
+
     const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "desc"), limit(50));
     onSnapshot(chatQuery, (snapshot) => {
         const list = document.getElementById("messagesList");
@@ -644,34 +725,55 @@ h1{
         docs.forEach((docSnap) => {
             const data = docSnap.data();
             const div = document.createElement("div");
-            div.className = "message";
+            div.className = data.deleted ? "message deleted-msg" : "message";
             
             let timeString = data.createdAt && data.createdAt.toDate ? 
                 data.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "gerade eben";
             
+            const msgHeader = document.createElement("div");
+            msgHeader.className = "msg-header";
+
             const boldUser = document.createElement("strong");
             boldUser.textContent = (data.user || 'Gast') + ": ";
-            div.appendChild(boldUser);
+            msgHeader.appendChild(boldUser);
 
-            const textNode = document.createElement("span");
-            textNode.textContent = data.text || '';
-            div.appendChild(textNode);
+            if (isOwner && !data.deleted) {
+                const delBtn = document.createElement("button");
+                delBtn.className = "delete-btn";
+                delBtn.textContent = "✕";
+                delBtn.title = "Nachricht löschen";
+                delBtn.onclick = () => deleteMessage(docSnap.id);
+                msgHeader.appendChild(delBtn);
+            }
 
-            const ytUrl = getYouTubeEmbedUrl(data.text || '');
-            if (ytUrl) {
-                const iframe = document.createElement("iframe");
-                iframe.src = ytUrl;
-                iframe.style.width = "100%";
-                iframe.style.height = "150px";
-                iframe.style.borderRadius = "8px";
-                iframe.style.marginTop = "8px";
-                iframe.style.border = "none";
-                iframe.referrerPolicy = "strict-origin-when-cross-origin";
-                // Sicherheits-Sandbox für den YouTube-Iframe eingebaut
-                iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-presentation";
-                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-                iframe.allowFullscreen = true;
-                div.appendChild(iframe);
+            div.appendChild(msgHeader);
+
+            if (data.deleted) {
+                const deletedSpan = document.createElement("span");
+                deletedSpan.style.color = "#64748b";
+                deletedSpan.style.fontStyle = "italic";
+                deletedSpan.textContent = "Nachricht gelöscht";
+                div.appendChild(deletedSpan);
+            } else {
+                const textNode = document.createElement("span");
+                textNode.textContent = data.text || '';
+                div.appendChild(textNode);
+
+                const ytUrl = getYouTubeEmbedUrl(data.text || '');
+                if (ytUrl) {
+                    const iframe = document.createElement("iframe");
+                    iframe.src = ytUrl;
+                    iframe.style.width = "100%";
+                    iframe.style.height = "150px";
+                    iframe.style.borderRadius = "8px";
+                    iframe.style.marginTop = "8px";
+                    iframe.style.border = "none";
+                    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+                    iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-presentation";
+                    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                    iframe.allowFullscreen = true;
+                    div.appendChild(iframe);
+                }
             }
 
             const timeSpan = document.createElement("span");
@@ -754,7 +856,8 @@ h1{
                 text: text,
                 user: isOwner ? "Yasin Dev" : chatUser,
                 createdAt: serverTimestamp(),
-                uid: currentUid
+                uid: currentUid,
+                deleted: false
             });
             input.value = "";
         } catch (e) {
