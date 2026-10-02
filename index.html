@@ -74,6 +74,7 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   margin:0 auto 16px;
   position:relative;
   display:grid;place-items:center;
+  cursor: pointer;
 }
 .hero-icon:before{
   content:"";position:absolute;inset:5px;border:1px dashed rgba(56,189,248,.28);
@@ -349,7 +350,8 @@ h1{
 <body>
 <main class="shell">
 <section class="card" aria-labelledby="title">
-  <div class="hero-icon" aria-hidden="true">
+  <!-- Klickbare Kaffeetasse für das Easter Egg -->
+  <div class="hero-icon" aria-hidden="true" onclick="playFinalCountdown()" title="The Final Countdown 🎶">
     <svg class="svg" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="65" cy="65" r="47" fill="#0f172a" stroke="rgba(255,255,255,.08)" stroke-width="1.5"/>
       <path class="steam" d="M57 39C54 34 60 30 58 24" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
@@ -419,6 +421,11 @@ h1{
     </div>
 </div>
 
+<!-- Versteckter Audio-Player für das Easter Egg -->
+<audio id="countdownAudio" preload="auto">
+    <source src="final-countdown.mp3" type="audio/mpeg">
+</audio>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -442,7 +449,57 @@ h1{
     let heartbeatInterval = null;
     let typingTimeout = null;
 
-    // Hilfsfunktion: Erkennt YouTube-Links (auch mit Text davor/dahinter)
+    // ==========================================
+    // EASTER EGG: THE FINAL COUNTDOWN (FADE-IN & 50% MAX)
+    // ==========================================
+    window.playFinalCountdown = function() {
+        const audio = document.getElementById("countdownAudio");
+        if (!audio.paused) return;
+
+        audio.volume = 0.0;
+        audio.play().then(() => {
+            let vol = 0.0;
+            const targetVolume = 0.5;       // Maximale Lautstärke: 50%
+            const fadeInDuration = 3000;    // 3 Sekunden Fade-In
+            const intervalTime = 100;       
+            const steps = fadeInDuration / intervalTime; 
+            const increment = targetVolume / steps;      
+
+            // 1. FADE-IN (3 Sekunden hoch auf 50%)
+            const fadeIn = setInterval(() => {
+                if (vol < targetVolume) {
+                    vol += increment;
+                    audio.volume = Math.min(vol, targetVolume);
+                } else {
+                    clearInterval(fadeIn);
+                }
+            }, intervalTime);
+
+            // 2. NACH 15 SEKUNDEN: Sanft ausblenden und stoppen
+            setTimeout(() => {
+                let fadeOutVol = audio.volume;
+                const fadeOutSteps = 20;
+                const fadeOutInterval = 100;
+                const decrement = fadeOutVol / fadeOutSteps;
+
+                const fadeOut = setInterval(() => {
+                    if (fadeOutVol > 0.02) {
+                        fadeOutVol -= decrement;
+                        audio.volume = Math.max(fadeOutVol, 0);
+                    } else {
+                        clearInterval(fadeOut);
+                        audio.pause();
+                        audio.currentTime = 0; 
+                    }
+                }, fadeOutInterval);
+            }, 15000); // 15 Sekunden Spielzeit
+
+        }).catch(e => {
+            console.log("Audio-Wiedergabe blockiert oder Datei fehlt:", e);
+        });
+    };
+
+    // Hilfsfunktion: Erkennt YouTube-Links
     function getYouTubeEmbedUrl(text) {
         const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([^#\&\?\s]{11})/;
         const match = text.match(regExp);
@@ -565,13 +622,11 @@ h1{
     // ==========================================
     // REALTIME LISTENERS (NACHRICHTEN & ONLINE-USER)
     // ==========================================
-    // GEFIXT: Holt die 50 NEUESTEN Nachrichten und dreht sie fürs Rendern um
     const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "desc"), limit(50));
     onSnapshot(chatQuery, (snapshot) => {
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
 
-        // Umdrehen, damit die neuste Nachricht unten erscheint
         const docs = [];
         snapshot.forEach(docSnap => docs.push(docSnap));
         docs.reverse();
