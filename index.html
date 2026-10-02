@@ -75,6 +75,11 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   position:relative;
   display:grid;place-items:center;
   cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.hero-icon:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 12px rgba(56,189,248,0.4));
 }
 .hero-icon:before{
   content:"";position:absolute;inset:5px;border:1px dashed rgba(56,189,248,.28);
@@ -350,8 +355,8 @@ h1{
 <body>
 <main class="shell">
 <section class="card" aria-labelledby="title">
-  <!-- Klickbare Kaffeetasse für das Easter Egg -->
-  <div class="hero-icon" aria-hidden="true" onclick="playFinalCountdown()" title="The Final Countdown 🎶">
+  <!-- Die Kaffeetasse ist jetzt der interaktive Play-Button -->
+  <div class="hero-icon" aria-hidden="true" onclick="playFinalCountdown()" title="▶ Klick mich für The Final Countdown! 🎶">
     <svg class="svg" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="65" cy="65" r="47" fill="#0f172a" stroke="rgba(255,255,255,.08)" stroke-width="1.5"/>
       <path class="steam" d="M57 39C54 34 60 30 58 24" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
@@ -450,7 +455,7 @@ h1{
     let typingTimeout = null;
 
     // ==========================================
-    // EASTER EGG: THE FINAL COUNTDOWN (FADE-IN & 50% MAX)
+    // EASTER EGG: KAFFEETASSE ALS PLAY-BUTTON
     // ==========================================
     window.playFinalCountdown = function() {
         const audio = document.getElementById("countdownAudio");
@@ -465,7 +470,7 @@ h1{
             const steps = fadeInDuration / intervalTime; 
             const increment = targetVolume / steps;      
 
-            // 1. FADE-IN (3 Sekunden hoch auf 50%)
+            // 1. FADE-IN (3 Sekunden sanft hoch auf 50%)
             const fadeIn = setInterval(() => {
                 if (vol < targetVolume) {
                     vol += increment;
