@@ -32,7 +32,7 @@ body{
   justify-content:center;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 24px 16px;
+  padding: 24px 16px 96px;
   margin:0;
   color:var(--text);
   font-family:'Inter', sans-serif;
@@ -49,7 +49,6 @@ body:before,body:after{
 body:before{width:220px;height:220px;background:#38bdf8;top:-100px;left:-70px}
 body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120px;animation-delay:-4s}
 @keyframes float{to{transform:translate(30px,24px) scale(1.08)}}
-
 .shell{
   width:min(100%, 680px);
   position:relative;
@@ -70,7 +69,6 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   background:linear-gradient(180deg,rgba(15,23,42,.88),rgba(8,13,24,.88));
   backdrop-filter:blur(24px);
 }
-
 .hero-icon{
   width:110px;height:110px;
   margin:0 auto 16px;
@@ -96,7 +94,6 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
 .steam{animation:steam 2.7s ease-in-out infinite}
 .steam.two{animation-delay:.7s}
 @keyframes steam{0%,100%{opacity:.2;transform:translateY(2px)}50%{opacity:.9;transform:translateY(-7px)}}
-
 .badge{
   display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;
   background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.2);
@@ -104,7 +101,6 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
 }
 .badge i{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pulse 1.7s infinite}
 @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
-
 h1{
   width:100%;
   text-align:center;
@@ -122,7 +118,6 @@ h1{
   font-size: clamp(0.85rem, 3vw, 0.95rem);
   line-height:1.6;
 }
-
 .status-grid{
   width:100%;
   display:grid;
@@ -143,7 +138,6 @@ h1{
 .dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:4px; }
 .dot.green { background:var(--green); box-shadow:0 0 6px var(--green); }
 .dot.amber { background:var(--amber); box-shadow:0 0 6px var(--amber); }
-
 .note{
   width:100%;
   display:flex;
@@ -154,7 +148,6 @@ h1{
   border:1px solid rgba(56,189,248,.12);color:#a5b4fc;font-size:0.75rem;line-height:1.5
 }
 .note-icon{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:rgba(56,189,248,.1);color:var(--cyan)}
-
 .footer{
   width:100%;
   margin:16px auto 0;
@@ -166,8 +159,6 @@ h1{
   text-align:center;
 }
 .footer strong{color:#cbd5e1}
-
-/* CHAT LAUNCHER BUTTON (Unten rechts, z-index 999) */
 .chat-launcher {
   position: fixed;
   bottom: 20px;
@@ -181,21 +172,19 @@ h1{
   font-size: 13px;
   font-weight: 600;
   box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  z-index: 999;
+  z-index: 1100;
   display: flex;
   align-items: center;
   gap: 8px;
   transition: transform 0.2s ease;
 }
 .chat-launcher:hover { transform: scale(1.05); }
-
-/* CHAT SCHUBLADE (Sitzt oberhalb des Buttons, z-index 1000) */
 .chat-widget {
   position: fixed;
-  bottom: 80px;
+  bottom: 84px;
   right: 20px;
   width: 340px;
-  max-height: 440px;
+  max-height: min(440px, calc(100dvh - 120px));
   background: rgba(15, 23, 42, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
@@ -209,27 +198,24 @@ h1{
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0) scale(1);
-  transition: all 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
-
-/* Eingeklappter Zustand */
 .chat-widget.collapsed {
   opacity: 0;
   pointer-events: none;
   transform: translateY(12px) scale(0.97);
 }
-
 @media(max-width: 768px) {
+  .chat-launcher { bottom: max(16px, env(safe-area-inset-bottom)); right: 16px; }
   .chat-widget {
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    max-height: 80vh;
-    border-radius: 20px 20px 0 0;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: min(70vh, calc(100dvh - 110px));
+    border-radius: 16px;
   }
 }
-
 .chat-header {
   background: rgba(30, 41, 59, 0.9);
   padding: 12px 14px;
@@ -287,15 +273,11 @@ h1{
   padding: 0 4px;
   font-weight: bold;
 }
-.delete-btn:hover {
-  color: #ef4444;
-}
-
-/* Toast Benachrichtigung */
+.delete-btn:hover { color: #ef4444; }
 .toast-notification {
   position: fixed;
   bottom: 85px;
-  right: 20px;
+  left: 20px;
   background: #1e293b;
   border: 1px solid rgba(239, 68, 68, 0.4);
   color: #f87171;
@@ -310,11 +292,7 @@ h1{
   transition: all 0.2s ease;
   pointer-events: none;
 }
-.toast-notification.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
+.toast-notification.show { opacity: 1; transform: translateY(0); }
 .chat-input-area {
   display: flex;
   padding: 10px;
@@ -343,18 +321,11 @@ h1{
   font-weight: 600;
 }
 .send-btn:hover { background: #2563eb; }
-
-/* Modals */
 .modal {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(11, 15, 25, 0.88);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   z-index: 1010;
   backdrop-filter: blur(4px);
 }
@@ -391,16 +362,10 @@ h1{
   font-size: 12px;
   margin-top: 4px;
 }
-.modal-error {
-  font-size: 10px;
-  color: #f87171;
-  margin-top: 4px;
-  min-height: 14px;
-}
+.modal-error { font-size: 10px; color: #f87171; margin-top: 4px; min-height: 14px; }
 .hidden { display: none !important; }
 .change-name { font-size: 10px; color: #94a3b8; cursor: pointer; }
 .change-name:hover { color: #fff; text-decoration: underline; }
-
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{animation:none!important;scroll-behavior:auto!important}
 }
@@ -409,8 +374,7 @@ h1{
 <body>
 <main class="shell">
 <section class="card" aria-labelledby="title">
-  <!-- Kaffeetasse als Sound-Player -->
-  <div class="hero-icon" onclick="playFinalCountdown()" title="▶ Klick für The Final Countdown 🎶">
+  <div class="hero-icon" onclick="playFinalCountdown()" title="Klick für The Final Countdown">
     <svg class="svg" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="65" cy="65" r="47" fill="#0f172a" stroke="rgba(255,255,255,.08)" stroke-width="1.5"/>
       <path class="steam" d="M57 39C54 34 60 30 58 24" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
@@ -421,15 +385,12 @@ h1{
       <path d="M43 85H87" stroke="rgba(255,255,255,.2)" stroke-width="2" stroke-linecap="round"/>
     </svg>
   </div>
-
   <div class="badge"><i></i> Wartungsarbeiten aktiv</div>
-
   <h1 id="title">Kurze schöpferische Kaffeepause</h1>
   <p class="lead">
     Aktuell befindet sich der einzig und alleinige Entwickler dieser Seite in einer wohlverdienten Kaffeepause.
     Da hier jede Zeile Code in reiner Solo-Handarbeit entsteht, laufen die Arbeiten mit Ruhe, Sorgfalt und auf unbestimmte Zeit.
   </p>
-
   <div class="status-grid">
     <div class="status-card" onclick="checkOwnerLoginTrigger()" title="Entwickler-Status (Klick für Admin-Login)">
       <small>Entwickler-Status</small>
@@ -440,44 +401,29 @@ h1{
       <strong id="visitorCountLabel" style="color: #cbd5e1;">Lade Besucher...</strong>
     </div>
   </div>
-
   <div class="note">
     <div class="note-icon">⌁</div>
-    <div>Die Seite ist nicht verschwunden — sie bekommt gerade ein kleines Upgrade. Danke für eure Geduld!</div>
+    <div>Die Seite bekommt gerade ein Upgrade. Schreib mir gerne eine kurze Notiz über den Button unten rechts!</div>
   </div>
-
   <footer class="footer">
     Danke für euer Verständnis und die Geduld!<br>
     <strong>Yasin Özer</strong>
   </footer>
 </section>
 </main>
-
-<!-- TOAST BENACHRICHTIGUNG -->
-<div class="toast-notification" id="toastNotification">🗑️ Nachricht moderiert</div>
-
-<!-- CHAT LAUNCHER BUTTON -->
-<button class="chat-launcher" id="chatLauncherBtn">💬 Schreib mir</button>
-
-<!-- CHAT SCHUBLADE (Startet mit .collapsed) -->
+<div class="toast-notification" id="toastNotification">Nachricht gelöscht</div>
+<button class="chat-launcher" id="chatLauncherBtn" type="button" aria-expanded="false">💬 Schreib mir</button>
 <div class="chat-widget collapsed" id="chatWidget" aria-hidden="true">
     <div class="chat-header">
-        <span>💬 Schreib mir...</span>
-        <div style="display:flex; gap:10px; align-items:center;">
-            <span class="change-name" id="userNameLabel" onclick="requestNameChange()" title="Namen ändern"></span>
-        </div>
+        <span>💬 Schreib mir</span>
+        <span class="change-name" id="userNameLabel" onclick="requestNameChange()" title="Namen ändern"></span>
     </div>
-
     <div class="chat-messages" id="messagesList"></div>
-
     <div id="typingIndicator" style="font-size: 11px; color: #94a3b8; padding: 4px 12px; font-style: italic; min-height: 20px; background: rgba(15, 23, 42, 0.4);"></div>
-
     <div class="chat-input-area">
         <input type="text" id="messageInput" maxlength="500" placeholder="Nachricht schreiben..." onfocus="checkNameBeforeWriting()" onkeypress="handleKeyPress(event)">
         <button class="send-btn" onclick="checkNameAndSend()">Senden</button>
     </div>
-
-    <!-- Gast Namens-Modal -->
     <div class="modal hidden" id="nameModal">
         <div class="modal-content">
             <p style="margin: 0; font-size: 12px; color: #cbd5e1;">Wie möchtest du heißen?</p>
@@ -486,11 +432,9 @@ h1{
             <button onclick="saveNameFromPopup()">Weiter</button>
         </div>
     </div>
-
-    <!-- Versteckter Owner-Login Modal -->
     <div class="modal hidden" id="ownerLoginModal">
         <div class="modal-content">
-            <p style="margin: 0; font-size: 12px; color: #cbd5e1;">🔒 Yasin Admin-Login</p>
+            <p style="margin: 0; font-size: 12px; color: #cbd5e1;">Yasin Admin-Login</p>
             <input type="email" id="ownerEmailInput" placeholder="E-Mail...">
             <input type="password" id="ownerPassInput" placeholder="Passwort...">
             <div class="modal-error" id="ownerLoginError"></div>
@@ -499,16 +443,13 @@ h1{
         </div>
     </div>
 </div>
-
 <audio id="countdownAudio" preload="auto">
     <source src="countdown.mp3" type="audio/mpeg">
 </audio>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, signInAnonymously, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
     const firebaseConfig = {
         apiKey: "AIzaSyCrLhxe9KeHM5DW96K8SfR9NNzXz1kpa1k",
         authDomain: "yasin-df29e.firebaseapp.com",
@@ -518,40 +459,36 @@ h1{
         appId: "1:606699184015:web:02b5bd8b73b0708c4735fa",
         measurementId: "G-18KSH8RRDZ"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
     let chatUser = localStorage.getItem("yasin_chat_username") || "";
     let currentUid = null;
     let isOwner = false;
     let heartbeatInterval = null;
-    let typingTimeout = null;
-
+    const OWNER_UID = "p952EuvWWFVkJALp1666OkRXuXC2";
+    let lastChatDocs = [];
     signInAnonymously(auth).catch(err => console.error("Anonym Auth Fehler:", err));
-
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUid = user.uid;
             startGuestHeartbeat();
         }
     });
-
-    // Launcher-Logik exakt nach Vorgabe
     const chatWidget = document.getElementById("chatWidget");
-    document.getElementById("chatLauncherBtn").addEventListener("click", () => {
+    const chatLauncher = document.getElementById("chatLauncherBtn");
+    chatLauncher.addEventListener("click", () => {
         const zu = chatWidget.classList.contains("collapsed");
-        chatWidget.classList.toggle("collapsed", !zu);
-        chatWidget.setAttribute("aria-hidden", !zu);
-        
-        if (zu) {
+        chatWidget.classList.toggle("collapsed");
+        const offen = !chatWidget.classList.contains("collapsed");
+        chatWidget.setAttribute("aria-hidden", offen ? "false" : "true");
+        chatLauncher.setAttribute("aria-expanded", offen ? "true" : "false");
+        if (offen) {
             const list = document.getElementById("messagesList");
             list.scrollTop = list.scrollHeight;
             if (chatUser) document.getElementById("messageInput").focus();
         }
     });
-
     window.playFinalCountdown = function() {
         const audio = document.getElementById("countdownAudio");
         if (!audio.paused) return;
@@ -566,7 +503,6 @@ h1{
                     clearInterval(fadeIn);
                 }
             }, 100);
-
             setTimeout(() => {
                 const fadeOut = setInterval(() => {
                     if (audio.volume > 0.02) {
@@ -578,47 +514,33 @@ h1{
                     }
                 }, 100);
             }, 15000);
-        }).catch(e => {
-            console.log("Audio blockiert:", e);
-        });
+        }).catch(() => {});
     };
-
     function sanitizeName(name) {
         return name.replace(/[^a-zA-Z0-9äöüÄÖÜß _-]/g, "").trim().substring(0, 16);
     }
-
-    // YouTube Erkennung (inklusive Shorts)
     function getYouTubeEmbedUrl(text) {
-        const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([^#\&\?\s]{11})/;
+        const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([^#&?\s\/]{11})/;
         const match = text.match(regExp);
         return match ? `https://www.youtube.com/embed/${match[1]}` : null;
     }
-
     document.addEventListener("DOMContentLoaded", () => {
         updateUserLabel();
-        if (!chatUser) {
-            document.getElementById("nameModal").classList.remove("hidden");
-        }
-
+        if (!chatUser) document.getElementById("nameModal").classList.remove("hidden");
         const msgInput = document.getElementById("messageInput");
-        if (msgInput) {
-            msgInput.addEventListener("input", window.handleTypingEvent);
-        }
+        if (msgInput) msgInput.addEventListener("input", window.handleTypingEvent);
     });
-
     window.handleOwnerLogout = async function() {
         if (heartbeatInterval) clearInterval(heartbeatInterval);
-        if (typingTimeout) clearInterval(typingTimeout);
+        if (typingTimeout) clearTimeout(typingTimeout);
         isOwner = false;
         try {
             await setDoc(doc(db, "presence", "owner"), { lastActive: new Date(0) }, { merge: true });
-        } catch(e) {}
+        } catch (e) {}
     };
-
     function startGuestHeartbeat() {
         if (!currentUid) return;
         if (heartbeatInterval) clearInterval(heartbeatInterval);
-
         async function sendHB() {
             if (isOwner) return;
             try {
@@ -628,34 +550,33 @@ h1{
                 }, { merge: true });
             } catch (e) {}
         }
-
         sendHB();
         heartbeatInterval = setInterval(sendHB, 30000);
     }
-
     window.checkOwnerLoginTrigger = function() {
         document.getElementById("ownerLoginModal").classList.remove("hidden");
         document.getElementById("ownerEmailInput").focus();
     };
-
     window.executeOwnerLogin = async function() {
         const email = document.getElementById("ownerEmailInput").value.trim();
         const pass = document.getElementById("ownerPassInput").value;
         const errEl = document.getElementById("ownerLoginError");
-
         try {
             await signInWithEmailAndPassword(auth, email, pass);
+            if (!auth.currentUser || auth.currentUser.uid !== OWNER_UID) {
+                errEl.textContent = "Nicht der Entwickler-Account.";
+                return;
+            }
             isOwner = true;
             document.getElementById("ownerLoginModal").classList.add("hidden");
             startOwnerHeartbeat();
+            renderMessages(lastChatDocs);
         } catch (e) {
             errEl.textContent = "Login fehlgeschlagen.";
         }
     };
-
     function startOwnerHeartbeat() {
         if (heartbeatInterval) clearInterval(heartbeatInterval);
-
         async function sendOwnerHB() {
             try {
                 await setDoc(doc(db, "presence", "owner"), {
@@ -664,23 +585,17 @@ h1{
                 }, { merge: true });
             } catch (e) {}
         }
-
         sendOwnerHB();
         heartbeatInterval = setInterval(sendOwnerHB, 30000);
     }
-
     window.addEventListener("beforeunload", () => {
-        window.handleOwnerLogout();
-        if (currentUid && !isOwner) {
-            deleteDoc(doc(db, "onlineUsers", currentUid)).catch(()=>{});
-        }
+        if (currentUid && !isOwner) deleteDoc(doc(db, "onlineUsers", currentUid)).catch(() => {});
     });
-
     onSnapshot(doc(db, "presence", "owner"), (docSnap) => {
         const statusText = document.getElementById("ownerStatusText");
         if (docSnap.exists()) {
             const data = docSnap.data();
-            if (data.lastActive && typeof data.lastActive.toDate === 'function') {
+            if (data.lastActive && typeof data.lastActive.toDate === "function") {
                 const diff = Date.now() - data.lastActive.toDate().getTime();
                 if (diff < 75000) {
                     statusText.innerHTML = `<span class="dot green"></span>Yasin Dev · online · am Werkeln`;
@@ -690,64 +605,44 @@ h1{
         }
         statusText.innerHTML = `<span class="dot amber"></span>Yasin · Kaffeepause`;
     });
-
-    // Soft-Delete (Twitch-Mod-Modus)
     window.deleteMessage = async function(msgId) {
         try {
-            await updateDoc(doc(db, "chatMessages", msgId), {
-                text: "Nachricht gelöscht",
-                deleted: true
-            });
-            showToast("🗑 Nachricht moderiert");
+            await updateDoc(doc(db, "chatMessages", msgId), { text: "Nachricht gelöscht", deleted: true });
+            showToast("Nachricht gelöscht");
         } catch (e) {
             console.error("Moderations-Fehler:", e);
-            alert("Fehler beim Moderieren. Bist du als Owner angemeldet?");
         }
     };
-
     function showToast(text) {
         const toast = document.getElementById("toastNotification");
         toast.textContent = text;
         toast.classList.add("show");
-        setTimeout(() => {
-            toast.classList.remove("show");
-        }, 2500);
+        setTimeout(() => toast.classList.remove("show"), 2500);
     }
-
-    const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "desc"), limit(50));
-    onSnapshot(chatQuery, (snapshot) => {
+    function renderMessages(docs) {
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
-        const docs = [];
-        snapshot.forEach(docSnap => docs.push(docSnap));
-        docs.reverse();
-
         docs.forEach((docSnap) => {
             const data = docSnap.data();
             const div = document.createElement("div");
             div.className = data.deleted ? "message deleted-msg" : "message";
-            
-            let timeString = data.createdAt && data.createdAt.toDate ? 
-                data.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "gerade eben";
-            
+            let timeString = data.createdAt && data.createdAt.toDate
+                ? data.createdAt.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                : "gerade eben";
             const msgHeader = document.createElement("div");
             msgHeader.className = "msg-header";
-
             const boldUser = document.createElement("strong");
-            boldUser.textContent = (data.user || 'Gast') + ": ";
+            boldUser.textContent = (data.user || "Gast") + ": ";
             msgHeader.appendChild(boldUser);
-
             if (isOwner && !data.deleted) {
                 const delBtn = document.createElement("button");
                 delBtn.className = "delete-btn";
-                delBtn.textContent = "✕";
+                delBtn.textContent = "löschen";
                 delBtn.title = "Nachricht löschen";
                 delBtn.onclick = () => deleteMessage(docSnap.id);
                 msgHeader.appendChild(delBtn);
             }
-
             div.appendChild(msgHeader);
-
             if (data.deleted) {
                 const deletedSpan = document.createElement("span");
                 deletedSpan.style.color = "#64748b";
@@ -756,10 +651,9 @@ h1{
                 div.appendChild(deletedSpan);
             } else {
                 const textNode = document.createElement("span");
-                textNode.textContent = data.text || '';
+                textNode.textContent = data.text || "";
                 div.appendChild(textNode);
-
-                const ytUrl = getYouTubeEmbedUrl(data.text || '');
+                const ytUrl = getYouTubeEmbedUrl(data.text || "");
                 if (ytUrl) {
                     const iframe = document.createElement("iframe");
                     iframe.src = ytUrl;
@@ -768,60 +662,56 @@ h1{
                     iframe.style.borderRadius = "8px";
                     iframe.style.marginTop = "8px";
                     iframe.style.border = "none";
-                    iframe.referrerPolicy = "strict-origin-when-cross-origin";
-                    iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-presentation";
                     iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
                     iframe.allowFullscreen = true;
                     div.appendChild(iframe);
                 }
             }
-
             const timeSpan = document.createElement("span");
             timeSpan.className = "msg-time";
             timeSpan.textContent = timeString;
             div.appendChild(timeSpan);
-            
             list.appendChild(div);
         });
         list.scrollTop = list.scrollHeight;
+    }
+    const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "desc"), limit(50));
+    onSnapshot(chatQuery, (snapshot) => {
+        const docs = [];
+        snapshot.forEach(docSnap => docs.push(docSnap));
+        docs.reverse();
+        lastChatDocs = docs;
+        renderMessages(docs);
     });
-
     onSnapshot(query(collection(db, "onlineUsers")), (snapshot) => {
         const now = Date.now();
         let activeCount = 0;
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
-            if (data.lastActive && typeof data.lastActive.toDate === 'function') {
-                if (now - data.lastActive.toDate().getTime() < 45000) {
-                    activeCount++;
-                }
+            if (data.lastActive && typeof data.lastActive.toDate === "function") {
+                if (now - data.lastActive.toDate().getTime() < 45000) activeCount++;
             }
         });
         document.getElementById("visitorCountLabel").textContent = activeCount > 0 ? `${activeCount} online` : "Niemand online";
     });
-
     function updateUserLabel() {
         const label = document.getElementById("userNameLabel");
         label.textContent = chatUser ? "👤 " + chatUser + " (ändern)" : "👤 Name festlegen";
     }
-
     window.checkNameBeforeWriting = function() {
         if (!chatUser) {
             document.getElementById("nameModal").classList.remove("hidden");
             document.getElementById("popupNameInput").focus();
         }
     };
-
     window.requestNameChange = function() {
         document.getElementById("nameModal").classList.remove("hidden");
         document.getElementById("popupNameInput").value = chatUser || "";
         document.getElementById("popupNameInput").focus();
     };
-
     window.saveNameFromPopup = function() {
         const val = sanitizeName(document.getElementById("popupNameInput").value);
         const errEl = document.getElementById("nameError");
-
         if (val.length < 2) {
             errEl.textContent = "Bitte mindestens 2 Zeichen.";
             return;
@@ -830,14 +720,12 @@ h1{
             errEl.textContent = "Dieser Name ist dem Entwickler vorbehalten.";
             return;
         }
-
         chatUser = val;
         localStorage.setItem("yasin_chat_username", chatUser);
         document.getElementById("nameModal").classList.add("hidden");
         updateUserLabel();
         document.getElementById("messageInput").focus();
     };
-
     window.checkNameAndSend = function() {
         if (!chatUser) {
             checkNameBeforeWriting();
@@ -845,12 +733,10 @@ h1{
         }
         sendMessage();
     };
-
     async function sendMessage() {
         const input = document.getElementById("messageInput");
         const text = input.value.trim();
         if (!text || text.length > 500) return;
-
         try {
             await addDoc(collection(db, "chatMessages"), {
                 text: text,
@@ -864,10 +750,10 @@ h1{
             console.error("Sende-Fehler:", e);
         }
     }
-
     window.handleKeyPress = function(e) {
-        if (e.key === 'Enter') checkNameAndSend();
+        if (e.key === "Enter") checkNameAndSend();
     };
+    window.handleTypingEvent = function() {};
 </script>
 </body>
 </html>
