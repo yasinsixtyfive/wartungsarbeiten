@@ -74,12 +74,6 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   margin:0 auto 16px;
   position:relative;
   display:grid;place-items:center;
-  cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
-}
-.hero-icon:hover {
-  transform: scale(1.08);
-  filter: drop-shadow(0 0 12px rgba(56,189,248,0.4));
 }
 .hero-icon:before{
   content:"";position:absolute;inset:5px;border:1px dashed rgba(56,189,248,.28);
@@ -355,8 +349,7 @@ h1{
 <body>
 <main class="shell">
 <section class="card" aria-labelledby="title">
-  <!-- Die Kaffeetasse ist jetzt der interaktive Play-Button -->
-  <div class="hero-icon" aria-hidden="true" onclick="playFinalCountdown()" title="▶ Klick mich für The Final Countdown! 🎶">
+  <div class="hero-icon" aria-hidden="true">
     <svg class="svg" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="65" cy="65" r="47" fill="#0f172a" stroke="rgba(255,255,255,.08)" stroke-width="1.5"/>
       <path class="steam" d="M57 39C54 34 60 30 58 24" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
@@ -420,16 +413,11 @@ h1{
     <div class="name-modal hidden" id="nameModal">
         <div class="name-modal-content">
             <p style="margin: 0; font-size: 12px; color: #cbd5e1;">Wie möchtest du im Chat heißen?</p>
-            <input type="text" id="popupNameInput" placeholder="Dein Name...">
+            <input type="text" id="popupNameInput" placeholder="Dein Name..." onkeypress="if(event.key==='Enter') saveNameFromPopup()">
             <button onclick="saveNameFromPopup()">Weiter</button>
         </div>
     </div>
 </div>
-
-<!-- Versteckter Audio-Player für das Easter Egg -->
-<audio id="countdownAudio" preload="auto">
-    <source src="final-countdown.mp3" type="audio/mpeg">
-</audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -455,54 +443,37 @@ h1{
     let typingTimeout = null;
 
     // ==========================================
-    // EASTER EGG: KAFFEETASSE ALS PLAY-BUTTON
+    // EASTER EGG: FINAL COUNTDOWN (3s Fade-in bis max 50%)
     // ==========================================
-    window.playFinalCountdown = function() {
-        const audio = document.getElementById("countdownAudio");
-        if (!audio.paused) return;
+    const countdownAudio = new Audio("countdown.mp3");
+    countdownAudio.volume = 0;
 
-        audio.volume = 0.0;
-        audio.play().then(() => {
-            let vol = 0.0;
-            const targetVolume = 0.5;       // Maximale Lautstärke: 50%
-            const fadeInDuration = 3000;    // 3 Sekunden Fade-In
-            const intervalTime = 100;       
-            const steps = fadeInDuration / intervalTime; 
-            const increment = targetVolume / steps;      
+    function playEpicEasterEgg() {
+        countdownAudio.play().then(() => {
+            const maxVolume = 0.5;
+            const fadeDurationMs = 3000;
+            const stepIntervalMs = 50;
+            const stepIncrement = maxVolume / (fadeDurationMs / stepIntervalMs);
 
-            // 1. FADE-IN (3 Sekunden sanft hoch auf 50%)
-            const fadeIn = setInterval(() => {
-                if (vol < targetVolume) {
-                    vol += increment;
-                    audio.volume = Math.min(vol, targetVolume);
+            const fadeInterval = setInterval(() => {
+                if (countdownAudio.volume + stepIncrement < maxVolume) {
+                    countdownAudio.volume += stepIncrement;
                 } else {
-                    clearInterval(fadeIn);
+                    countdownAudio.volume = maxVolume;
+                    clearInterval(fadeInterval);
                 }
-            }, intervalTime);
+            }, stepIntervalMs);
 
-            // 2. NACH 15 SEKUNDEN: Sanft ausblenden und stoppen
             setTimeout(() => {
-                let fadeOutVol = audio.volume;
-                const fadeOutSteps = 20;
-                const fadeOutInterval = 100;
-                const decrement = fadeOutVol / fadeOutSteps;
-
-                const fadeOut = setInterval(() => {
-                    if (fadeOutVol > 0.02) {
-                        fadeOutVol -= decrement;
-                        audio.volume = Math.max(fadeOutVol, 0);
-                    } else {
-                        clearInterval(fadeOut);
-                        audio.pause();
-                        audio.currentTime = 0; 
-                    }
-                }, fadeOutInterval);
-            }, 15000); // 15 Sekunden Spielzeit
-
-        }).catch(e => {
-            console.log("Audio-Wiedergabe blockiert oder Datei fehlt:", e);
+                countdownAudio.pause();
+                countdownAudio.currentTime = 0;
+            }, 15000);
+        }).catch((err) => {
+            console.log("Audio-Autoplay vom Browser blockiert:", err);
         });
-    };
+    }
+
+    document.addEventListener("pointerdown", playEpicEasterEgg, { once: true });
 
     // Hilfsfunktion: Erkennt YouTube-Links
     function getYouTubeEmbedUrl(text) {
@@ -657,7 +628,6 @@ h1{
             textNode.textContent = data.text || '';
             div.appendChild(textNode);
 
-            // YouTube-Einbettung
             const ytUrl = getYouTubeEmbedUrl(data.text || '');
             if (ytUrl) {
                 const iframe = document.createElement("iframe");
