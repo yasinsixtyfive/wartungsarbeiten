@@ -2,9 +2,21 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#070b14">
-<title>Wartungsarbeiten • Maintenance</title>
+
+<!-- WhatsApp & Social Preview -->
+<title>Yasin Özer • Kurze Kaffeepause</title>
+<meta name="description" content="Persönliche Website von Yasin Özer. Aktuell im Umbau – schreib mir gerne eine kurze Nachricht!">
+<meta property="og:title" content="Yasin Özer • Solo-Entwickler">
+<meta property="og:description" content="Aktuell in einer kurzen Kaffeepause. Hinterlass mir gerne eine Notiz auf der Pinnwand!">
+<meta property="og:type" content="website">
+
+<!-- Inter Font offiziell einbinden -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
 :root{
   --bg:#070b14;
@@ -19,10 +31,10 @@
   --green:#34d399;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth; height: -webkit-fill-available;}
+html{scroll-behavior:smooth; min-height: 100%;}
 body{
   min-height: 100vh;
-  min-height: -webkit-fill-available;
+  min-height: 100dvh;
   width:100%;
   display:flex;
   flex-direction: column;
@@ -30,10 +42,10 @@ body{
   justify-content:center;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 24px 16px 140px 16px;
+  padding: 24px 16px 80px 16px;
   margin:0;
   color:var(--text);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-family:'Inter',ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:
     radial-gradient(circle at 15% 10%,rgba(56,189,248,.16),transparent 30%),
     radial-gradient(circle at 90% 85%,rgba(99,102,241,.18),transparent 32%),
@@ -63,7 +75,7 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   overflow:hidden;
   border:1px solid rgba(255,255,255,.07);
   border-radius:23px;
-  padding:20px;
+  padding:28px 24px;
   text-align:center;
   background:linear-gradient(180deg,rgba(15,23,42,.88),rgba(8,13,24,.88));
   backdrop-filter:blur(24px);
@@ -74,7 +86,13 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   margin:0 auto 16px;
   position:relative;
   display:grid;place-items:center;
+  cursor: pointer;
+  outline: none;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
 }
+.hero-icon:hover { transform: scale(1.04); }
+.hero-icon:focus-visible{ box-shadow: 0 0 0 3px var(--cyan); }
 .hero-icon:before{
   content:"";position:absolute;inset:5px;border:1px dashed rgba(56,189,248,.28);
   border-radius:50%;animation:spin 18s linear infinite
@@ -92,7 +110,7 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
 .badge{
   display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;
   background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.2);
-  color:#fbbf24;font-size:0.75rem;font-weight:750;margin-bottom:12px
+  color:#fbbf24;font-size:0.75rem;font-weight:700;margin-bottom:12px
 }
 .badge i{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pulse 1.7s infinite}
 @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
@@ -100,7 +118,7 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
 h1{
   width:100%;
   text-align:center;
-  font-size: clamp(1.3rem, 4.5vw, 1.9rem);
+  font-size: clamp(1.35rem, 4.5vw, 1.95rem);
   letter-spacing:-.03em;
   line-height:1.2;
   margin:0 auto 10px;
@@ -119,16 +137,15 @@ h1{
   width:100%;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:8px;
+  gap:10px;
   text-align:left;
-  margin:20px auto 16px;
+  margin:22px auto 18px;
 }
 .status-card{
-  padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)
+  padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)
 }
-.status-card small{display:block;color:#64748b;font-size:0.65rem;text-transform:uppercase;letter-spacing:.08em;font-weight:750;margin-bottom:4px}
-.status-card strong{display:block;font-size:0.8rem;color:#e2e8f0;line-height:1.3}
-.status-card .amber{color:#fbbf24}
+.status-card small{display:block;color:#64748b;font-size:0.65rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:4px}
+.status-card strong{display:block;font-size:0.82rem;color:#e2e8f0;line-height:1.3}
 
 .note{
   width:100%;
@@ -136,14 +153,14 @@ h1{
   gap:10px;
   align-items:flex-start;
   text-align:left;
-  padding:12px;border-radius:12px;background:rgba(56,189,248,.045);
+  padding:12px 14px;border-radius:12px;background:rgba(56,189,248,.045);
   border:1px solid rgba(56,189,248,.12);color:#a5b4fc;font-size:0.75rem;line-height:1.5
 }
 .note-icon{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:rgba(56,189,248,.1);color:var(--cyan)}
 
 .footer{
   width:100%;
-  margin:16px auto 0;
+  margin:18px auto 0;
   padding-top:14px;
   border-top:1px solid var(--line);
   color:#64748b;
@@ -153,38 +170,69 @@ h1{
 }
 .footer strong{color:#cbd5e1}
 
-/* CHAT-WIDGET STYLING */
-.chat-widget {
+/* ==========================================
+   FLOATING CHAT LAUNCHER & DRAWER WIDGET
+   ========================================== */
+.chat-launcher {
   position: fixed;
   bottom: 20px;
   right: 20px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+  z-index: 999;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.chat-launcher:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.55);
+}
+
+.chat-widget {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
   width: 340px;
-  max-height: 420px;
-  background: rgba(15, 23, 42, 0.88);
+  max-height: 440px;
+  background: rgba(15, 23, 42, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+  box-shadow: 0 20px 45px rgba(0,0,0,0.65);
   overflow: hidden;
   z-index: 1000;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.chat-widget.collapsed {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px) scale(0.97);
 }
 
-@media(max-width: 768px) {
+@media(max-width: 480px) {
   .chat-widget {
-    bottom: max(10px, env(safe-area-inset-bottom));
-    left: 10px;
-    right: 10px;
+    bottom: 75px;
+    left: 12px;
+    right: 12px;
     width: auto;
-    max-width: none;
-    max-height: 330px;
+    max-height: 380px;
   }
 }
 
 .chat-header {
-  background: rgba(30, 41, 59, 0.9);
+  background: rgba(30, 41, 59, 0.95);
   padding: 10px 14px;
   font-size: 11px;
   font-weight: 600;
@@ -193,8 +241,24 @@ h1{
   justify-content: space-between;
   align-items: center;
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.close-chat-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 4px;
+}
+.close-chat-btn:hover { color: #fff; }
+
 .chat-messages {
-  height: 190px;
+  height: 220px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 10px;
@@ -205,17 +269,12 @@ h1{
 }
 .message {
   background: rgba(51, 65, 85, 0.85);
-  padding: 8px 10px;
+  padding: 8px 12px;
   border-radius: 10px;
   max-width: 88%;
   word-break: break-word;
   color: #f8fafc;
-  position: relative;
-}
-.message img {
-  max-width: 100%;
-  border-radius: 6px;
-  margin-top: 6px;
+  line-height: 1.4;
 }
 .msg-time {
   display: block;
@@ -237,34 +296,34 @@ h1{
   background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  padding: 8px;
+  padding: 8px 10px;
   color: #fff;
   font-size: 12px;
   outline: none;
 }
-.chat-input-area input[type="file"] {
-  display: none;
+.chat-input-area input[type="text"]:focus {
+  border-color: var(--cyan);
 }
-.file-upload-btn, .send-btn {
+.send-btn {
   background: #3b82f6;
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
 }
-.file-upload-btn:hover, .send-btn:hover { background: #2563eb; }
+.send-btn:hover { background: #2563eb; }
 
-/* Namens-Popup */
+/* Namens-Modal mit Inline-Feedback */
 .name-modal {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(11, 15, 25, 0.85);
+  background: rgba(11, 15, 25, 0.88);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -274,30 +333,36 @@ h1{
 .name-modal-content {
   background: #1e293b;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 16px;
+  padding: 18px;
   border-radius: 12px;
   text-align: center;
   width: 85%;
-  max-width: 240px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  max-width: 250px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
 .name-modal-content input {
   width: 100%;
   background: #0f172a;
   border: 1px solid #475569;
   border-radius: 6px;
-  padding: 6px;
+  padding: 8px;
   color: #fff;
   text-align: center;
   font-size: 12px;
-  margin: 8px 0;
+  margin: 8px 0 4px;
   outline: none;
+}
+.form-error-msg {
+  color: #f87171;
+  font-size: 10px;
+  min-height: 14px;
+  margin-bottom: 8px;
 }
 .name-modal-content button {
   background: #3b82f6;
   color: #fff;
   border: none;
-  padding: 6px 12px;
+  padding: 7px 16px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
@@ -310,47 +375,14 @@ h1{
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{animation:none!important;scroll-behavior:auto!important}
 }
-
-/* ================================
-   MOBILE SCROLL FIX
-   ================================ */
-@media (max-width: 768px) {
-  html {
-    height: auto;
-    min-height: 100%;
-    overflow-x: hidden;
-  }
-
-  body {
-    min-height: 100dvh;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: 24px 12px 380px 12px;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .shell {
-    width: 100%;
-    max-width: 680px;
-    margin: 20px auto 0 auto;
-  }
-
-  .chat-widget {
-    bottom: max(12px, env(safe-area-inset-bottom));
-  }
-}
 </style>
 </head>
 <body>
 <main class="shell">
 <section class="card" aria-labelledby="title">
-  <div class="hero-icon" aria-hidden="true">
-    <svg class="svg" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Audio Trigger NUR HIER an der Kaffeetasse -->
+  <div class="hero-icon" id="coffeeMugBtn" role="button" tabindex="0" aria-label="Kaffee trinken & Sound starten" title="Klicke auf die Kaffeetasse ☕">
+    <svg class="svg" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <circle cx="65" cy="65" r="47" fill="#0f172a" stroke="rgba(255,255,255,.08)" stroke-width="1.5"/>
       <path class="steam" d="M57 39C54 34 60 30 58 24" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
       <path class="steam two" d="M72 39C69 34 75 30 73 24" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
@@ -365,55 +397,66 @@ h1{
 
   <h1 id="title">Kurze schöpferische Kaffeepause</h1>
   <p class="lead">
-    Aktuell befindet sich der einzig und alleinige Entwickler dieser Seite in einer wohlverdienten Kaffeepause.
-    Da hier jede Zeile Code in reiner Solo-Handarbeit entsteht, laufen die Arbeiten mit Ruhe, Sorgfalt und auf unbestimmte Zeit.
+    Aktuell befindet sich der Entwickler dieser Seite in einer wohlverdienten Pause.
+    Da hier jede Zeile Code in reiner Solo-Handarbeit entsteht, laufen die Arbeiten mit Ruhe und Sorgfalt.
   </p>
 
   <div class="status-grid">
+    <!-- Live-Status von Yasin -->
     <div class="status-card">
       <small>Entwickler-Status</small>
-      <strong>☕ In der Kaffeepause · Solo-Dev</strong>
+      <strong id="yasinDevStatus">☕ In Kaffeepause</strong>
     </div>
+    <!-- Dezente Gäste-Anzeige -->
     <div class="status-card">
-      <small>Voraussichtliche Dauer</small>
-      <strong class="amber">Auf unbestimmte Zeit</strong>
+      <small>Gerade auf der Seite</small>
+      <strong id="visitorCountStatus">👥 1 Besucher da</strong>
     </div>
   </div>
 
   <div class="note">
     <div class="note-icon">⌁</div>
-    <div>Die Seite ist nicht verschwunden — sie bekommt gerade ein kleines Upgrade. Danke für eure Geduld!</div>
+    <div>Die Seite bekommt gerade ein Upgrade. Schreib mir gerne eine kurze Notiz über den Button unten rechts!</div>
   </div>
 
   <footer class="footer">
-    Danke für euer Verständnis und die Geduld!<br>
+    Danke für deinen Besuch!<br>
     <strong>Yasin Özer</strong>
   </footer>
 </section>
 </main>
 
-<div class="chat-widget">
+<!-- FLOATING CHAT BUTTON (EINKLAPPBAR) -->
+<button class="chat-launcher" id="chatLauncherBtn" aria-label="Nachrichten öffnen">
+  <span>💬</span>
+  <span>Schreib mir</span>
+</button>
+
+<!-- CHAT FENSTER (INITIAL EINGEKLAPPT) -->
+<div class="chat-widget collapsed" id="chatWidget" aria-hidden="true">
     <div class="chat-header">
-        <span>💬 Live-Testchat</span>
-        <span class="change-name" id="userNameLabel" onclick="requestNameChange()" title="Namen ändern"></span>
+        <span>💬 Schreib mir</span>
+        <div class="header-actions">
+            <span class="change-name" id="userNameLabel" onclick="requestNameChange()" title="Namen ändern"></span>
+            <button class="close-chat-btn" id="closeChatBtn" title="Chat schließen">✕</button>
+        </div>
     </div>
 
     <div class="chat-messages" id="messagesList"></div>
 
-    <!-- Anzeige für tippende Benutzer -->
     <div id="typingIndicator" style="font-size: 11px; color: #94a3b8; padding: 4px 12px; font-style: italic; min-height: 20px; background: rgba(15, 23, 42, 0.4);"></div>
 
     <div class="chat-input-area">
-        <input type="text" id="messageInput" placeholder="Nachricht schreiben..." onfocus="checkNameBeforeWriting()" onkeypress="handleKeyPress(event)">
-        <label class="file-upload-btn" for="imageInput" title="Bild hochladen">📷</label>
-        <input type="file" id="imageInput" accept="image/*" onchange="uploadImage(this)">
+        <input type="text" id="messageInput" placeholder="Kurze Nachricht schreiben..." maxlength="500" onfocus="checkNameBeforeWriting()" onkeypress="handleKeyPress(event)">
         <button class="send-btn" onclick="checkNameAndSend()">Senden</button>
     </div>
 
+    <!-- Namens-Modal -->
     <div class="name-modal hidden" id="nameModal">
         <div class="name-modal-content">
-            <p style="margin: 0; font-size: 12px; color: #cbd5e1;">Wie möchtest du im Chat heißen?</p>
-            <input type="text" id="popupNameInput" placeholder="Dein Name..." onkeypress="if(event.key==='Enter') saveNameFromPopup()">
+            <p style="margin: 0; font-size: 12px; color: #cbd5e1; font-weight: 500;">Wie heißt du?</p>
+            <input type="text" id="popupNameInput" maxlength="16" placeholder="Dein Name..." onkeypress="if(event.key==='Enter') saveNameFromPopup()">
+            <div class="form-error-msg" id="nameErrorMsg"></div>
             <button onclick="saveNameFromPopup()">Weiter</button>
         </div>
     </div>
@@ -435,20 +478,38 @@ h1{
     };
 
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
+    try { getAnalytics(app); } catch (e) { /* Adblocker abfangen */ }
     const db = getFirestore(app);
+
+    // Eigene Session-ID pro Browser-Tab (kein Überschreiben bei gleichem Namen)
+    let chatSessionId = sessionStorage.getItem("yasin_chat_session_id");
+    if (!chatSessionId) {
+        chatSessionId = "sess_" + Math.random().toString(36).substring(2, 11);
+        sessionStorage.setItem("yasin_chat_session_id", chatSessionId);
+    }
 
     let chatUser = localStorage.getItem("yasin_chat_username");
     let heartbeatInterval = null;
     let typingTimeout = null;
+    let isCurrentlyTyping = false;
+
+    function sanitizeName(name) {
+        return name.replace(/[^a-zA-Z0-9_\- äöüÄÖÜß]/g, "").trim().substring(0, 16);
+    }
+
+    if (chatUser) chatUser = sanitizeName(chatUser);
 
     // ==========================================
-    // EASTER EGG: FINAL COUNTDOWN (3s Fade-in bis max 50%)
+    // AUDIO EASTER EGG (NUR BEIM KLICK AUF DIE TASSE)
     // ==========================================
     const countdownAudio = new Audio("countdown.mp3");
     countdownAudio.volume = 0;
+    let audioPlaying = false;
 
     function playEpicEasterEgg() {
+        if (audioPlaying) return;
+        audioPlaying = true;
+
         countdownAudio.play().then(() => {
             const maxVolume = 0.5;
             const fadeDurationMs = 3000;
@@ -467,35 +528,66 @@ h1{
             setTimeout(() => {
                 countdownAudio.pause();
                 countdownAudio.currentTime = 0;
+                audioPlaying = false;
             }, 15000);
-        }).catch((err) => {
-            console.log("Audio-Autoplay vom Browser blockiert:", err);
+        }).catch(() => {
+            audioPlaying = false;
         });
     }
 
-    document.addEventListener("pointerdown", playEpicEasterEgg, { once: true });
+    const mugBtn = document.getElementById("coffeeMugBtn");
+    if (mugBtn) {
+        mugBtn.addEventListener("click", playEpicEasterEgg);
+        mugBtn.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                playEpicEasterEgg();
+            }
+        });
+    }
 
-    // Hilfsfunktion: Erkennt YouTube-Links
+    // ==========================================
+    // CHAT EINKLAPP-LOGIK
+    // ==========================================
+    const chatWidget = document.getElementById("chatWidget");
+    const chatLauncher = document.getElementById("chatLauncherBtn");
+    const closeChatBtn = document.getElementById("closeChatBtn");
+
+    function toggleChat() {
+        const isCollapsed = chatWidget.classList.contains("collapsed");
+        if (isCollapsed) {
+            chatWidget.classList.remove("collapsed");
+            chatWidget.setAttribute("aria-hidden", "false");
+            const msgList = document.getElementById("messagesList");
+            msgList.scrollTop = msgList.scrollHeight;
+        } else {
+            chatWidget.classList.add("collapsed");
+            chatWidget.setAttribute("aria-hidden", "true");
+        }
+    }
+
+    chatLauncher.addEventListener("click", toggleChat);
+    closeChatBtn.addEventListener("click", toggleChat);
+
+    // YouTube Embed
     function getYouTubeEmbedUrl(text) {
         const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([^#\&\?\s]{11})/;
         const match = text.match(regExp);
         return match ? `https://www.youtube.com/embed/${match[1]}` : null;
     }
 
-    window.onload = function() {
+    window.addEventListener("DOMContentLoaded", () => {
         updateUserLabel();
-        if (chatUser) {
-            startHeartbeat();
-        }
+        if (chatUser) startHeartbeat();
 
         const msgInput = document.getElementById("messageInput");
         if (msgInput) {
             msgInput.addEventListener("input", window.handleTypingEvent);
         }
-    };
+    });
 
     // ==========================================
-    // ONLINE-STATUS & ZEIT-TRACKING (KWICK-STIL)
+    // ONLINE-STATUS & ZEIT-TRACKING
     // ==========================================
     function startHeartbeat() {
         if (!chatUser) return;
@@ -510,82 +602,91 @@ h1{
 
         async function sendHeartbeat() {
             try {
-                await setDoc(doc(db, "onlineUsers", chatUser), {
+                await setDoc(doc(db, "onlineUsers", chatSessionId), {
                     user: chatUser,
                     lastActive: serverTimestamp(),
                     loginTime: Number(loginTime)
                 }, { merge: true });
             } catch (e) {
-                console.error("Fehler beim Online-Status-Update:", e);
+                console.warn("Heartbeat Fehler:", e);
             }
         }
 
         sendHeartbeat();
-        heartbeatInterval = setInterval(sendHeartbeat, 20000);
+        heartbeatInterval = setInterval(sendHeartbeat, 30000);
     }
 
     async function setTypingStatus(isTyping) {
         if (!chatUser) return;
         try {
-            await setDoc(doc(db, "onlineUsers", chatUser), {
+            await setDoc(doc(db, "onlineUsers", chatSessionId), {
                 isTyping: isTyping
             }, { merge: true });
         } catch (e) {
-            console.error("Fehler beim Aktualisieren des Tipp-Status:", e);
+            console.warn("Typing Fehler:", e);
         }
     }
 
     window.handleTypingEvent = function() {
         if (!chatUser) return;
 
+        if (!isCurrentlyTyping) {
+            isCurrentlyTyping = true;
+            setTypingStatus(true);
+        }
+
         if (typingTimeout) clearTimeout(typingTimeout);
-        setTypingStatus(true);
 
         typingTimeout = setTimeout(() => {
+            isCurrentlyTyping = false;
             setTypingStatus(false);
         }, 3000);
     };
 
     window.addEventListener("beforeunload", () => {
-        if (chatUser) {
-            deleteDoc(doc(db, "onlineUsers", chatUser));
+        if (chatUser && chatSessionId) {
+            deleteDoc(doc(db, "onlineUsers", chatSessionId)).catch(() => {});
         }
     });
 
     // ==========================================
-    // USER INTERFACE & MODAL LOGIK
+    // USER INTERFACE & MODAL
     // ==========================================
     function updateUserLabel() {
         const label = document.getElementById("userNameLabel");
         if (chatUser) {
-            label.innerText = "👤 " + chatUser + " (ändern)";
+            label.textContent = "👤 " + chatUser + " (ändern)";
         } else {
-            label.innerText = "👤 Name festlegen";
+            label.textContent = "👤 Name festlegen";
         }
     }
 
     window.checkNameBeforeWriting = function() {
         if (!chatUser) {
+            document.getElementById("nameErrorMsg").textContent = "";
             document.getElementById("nameModal").classList.remove("hidden");
             document.getElementById("popupNameInput").focus();
         }
     };
 
     window.requestNameChange = function() {
+        document.getElementById("nameErrorMsg").textContent = "";
         document.getElementById("nameModal").classList.remove("hidden");
         document.getElementById("popupNameInput").value = chatUser || "";
         document.getElementById("popupNameInput").focus();
     };
 
     window.saveNameFromPopup = function() {
-        const val = document.getElementById("popupNameInput").value.trim();
-        if (!val) {
-            alert("Bitte gib einen Namen ein.");
+        const errEl = document.getElementById("nameErrorMsg");
+        const rawVal = document.getElementById("popupNameInput").value;
+        const val = sanitizeName(rawVal);
+        
+        if (!val || val.length < 2) {
+            errEl.textContent = "Bitte mindestens 2 Zeichen eingeben.";
             return;
         }
-        if (chatUser && chatUser !== val) {
-            deleteDoc(doc(db, "onlineUsers", chatUser));
-        }
+        errEl.textContent = "";
+
         chatUser = val;
         localStorage.setItem("yasin_chat_username", chatUser);
         sessionStorage.removeItem("yasin_login_time");
@@ -596,7 +697,7 @@ h1{
     };
 
     // ==========================================
-    // REALTIME LISTENERS (NACHRICHTEN & ONLINE-USER)
+    // REALTIME LISTENERS
     // ==========================================
     const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "desc"), limit(50));
     onSnapshot(chatQuery, (snapshot) => {
@@ -612,16 +713,14 @@ h1{
             const div = document.createElement("div");
             div.className = "message";
             
-            let timeString = "";
+            let timeString = "gerade eben";
             if (data.createdAt && data.createdAt.toDate) {
                 const date = data.createdAt.toDate();
                 timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            } else {
-                timeString = "gerade eben";
             }
             
             const boldUser = document.createElement("strong");
-            boldUser.textContent = (data.user || 'Anonym') + ": ";
+            boldUser.textContent = (data.user || 'Besucher') + ": ";
             div.appendChild(boldUser);
 
             const textNode = document.createElement("span");
@@ -637,18 +736,11 @@ h1{
                 iframe.style.borderRadius = "8px";
                 iframe.style.marginTop = "8px";
                 iframe.style.border = "none";
+                iframe.referrerPolicy = "strict-origin-when-cross-origin";
+                iframe.loading = "lazy";
                 iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
                 iframe.allowFullscreen = true;
                 div.appendChild(iframe);
-            }
-
-            if (data.imageUrl) {
-                const br = document.createElement("br");
-                div.appendChild(br);
-                const img = document.createElement("img");
-                img.src = data.imageUrl;
-                img.alt = "Bild";
-                div.appendChild(img);
             }
             
             const timeSpan = document.createElement("span");
@@ -659,72 +751,69 @@ h1{
             list.appendChild(div);
         });
         list.scrollTop = list.scrollHeight;
+    }, (error) => {
+        console.warn("Chat Listener Fehler:", error);
     });
 
     const onlineQuery = query(collection(db, "onlineUsers"));
     onSnapshot(onlineQuery, (snapshot) => {
         const now = Date.now();
-        const activeUsersDetails = [];
+        let totalOnlineCount = 0;
+        let isYasinOnline = false;
         const typingUsers = [];
 
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
-            let isOnline = false;
 
+            // Fehlendes lastActive gilt strikt als offline!
             if (data.lastActive && data.lastActive.toDate) {
                 const lastActiveTime = data.lastActive.toDate().getTime();
-                if (now - lastActiveTime < 40000) {
-                    isOnline = true;
-                    
-                    let durationText = "seit 1 Min.";
-                    if (data.loginTime) {
-                        const diffMin = Math.floor((now - data.loginTime) / 60000);
-                        if (diffMin < 1) {
-                            durationText = "seit wenigen Sek.";
-                        } else if (diffMin === 1) {
-                            durationText = "seit 1 Min.";
-                        } else if (diffMin < 60) {
-                            durationText = `seit ${diffMin} Min.`;
-                        } else {
-                            const hrs = Math.floor(diffMin / 60);
-                            durationText = `seit ${hrs} Std.`;
-                        }
-                    }
-                    activeUsersDetails.push(`${data.user} (${durationText})`);
-                }
-            } else {
-                isOnline = true;
-                activeUsersDetails.push(`${data.user}`);
-            }
+                if (now - lastActiveTime < 75000) {
+                    totalOnlineCount++;
 
-            if (isOnline && data.isTyping && data.user !== chatUser) {
-                typingUsers.push(data.user);
+                    // Prüfen ob Entwickler Yasin da ist
+                    const uName = (data.user || "").trim().toLowerCase();
+                    if (uName === "yasin" || uName.startsWith("yasin ")) {
+                        isYasinOnline = true;
+                    }
+
+                    if (data.isTyping && data.user !== chatUser) {
+                        typingUsers.push(data.user);
+                    }
+                }
             }
         });
 
-        const headerTitle = document.querySelector(".chat-header span:first-child");
-        if (activeUsersDetails.length > 0) {
-            headerTitle.innerHTML = `💬 Live-Testchat <span style="color: #34d399; font-size: 9px; margin-left: 4px; font-weight: normal;">● ${activeUsersDetails.length} online: ${activeUsersDetails.join(", ")}</span>`;
+        // 1. Entwickler-Status auf Hauptkarte aktualisieren
+        const devStatusEl = document.getElementById("yasinDevStatus");
+        if (isYasinOnline) {
+            devStatusEl.innerHTML = `<span style="color: #34d399;">🟢 Yasin online · am Werkeln</span>`;
         } else {
-            headerTitle.innerHTML = `💬 Live-Testchat`;
+            devStatusEl.innerHTML = `☕ In Kaffeepause`;
         }
 
+        // 2. Besucherzahl auf Hauptkarte aktualisieren
+        const visitorStatusEl = document.getElementById("visitorCountStatus");
+        const count = Math.max(1, totalOnlineCount);
+        visitorStatusEl.textContent = `👥 ${count} ${count === 1 ? 'Besucher da' : 'Besucher da'}`;
+
+        // 3. Typing Indicator
         const typingIndicator = document.getElementById("typingIndicator");
         if (typingIndicator) {
             if (typingUsers.length > 0) {
-                if (typingUsers.length === 1) {
-                    typingIndicator.textContent = `✍️ ${typingUsers[0]} schreibt...`;
-                } else {
-                    typingIndicator.textContent = `✍️ Mehrere Personen schreiben...`;
-                }
+                typingIndicator.textContent = typingUsers.length === 1 
+                    ? `✍️ ${typingUsers[0]} schreibt...` 
+                    : `✍️ Mehrere Personen schreiben...`;
             } else {
                 typingIndicator.textContent = "";
             }
         }
+    }, (error) => {
+        console.warn("OnlineUsers Fehler:", error);
     });
 
     // ==========================================
-    // CHAT SENDEN-LOGIK & BILD-UPLOAD
+    // CHAT SENDEN (REINER TEXT)
     // ==========================================
     window.checkNameAndSend = function() {
         if (!chatUser) {
@@ -738,8 +827,13 @@ h1{
         const input = document.getElementById("messageInput");
         const text = input.value.trim();
         if (!text) return;
+        if (text.length > 500) {
+            input.value = text.substring(0, 500);
+            return;
+        }
 
         if (typingTimeout) clearTimeout(typingTimeout);
+        isCurrentlyTyping = false;
         setTypingStatus(false);
 
         try {
@@ -753,54 +847,6 @@ h1{
             console.error("Fehler beim Senden: ", e);
         }
     }
-
-    window.uploadImage = function(input) {
-        if (!chatUser) {
-            checkNameBeforeWriting();
-            input.value = "";
-            return;
-        }
-        const file = input.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement("canvas");
-                const MAX_WIDTH = 600;
-                const MAX_HEIGHT = 600;
-                let width = img.width;
-                let height = img.height;
-                if (width > height) {
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
-                    }
-                } else {
-                    if (height > MAX_HEIGHT) {
-                        width *= MAX_HEIGHT / height;
-                        height = MAX_HEIGHT;
-                    }
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0, width, height);
-                const compressedBase64 = canvas.toDataURL("image/jpeg", 0.6);
-
-                addDoc(collection(db, "chatMessages"), {
-                    text: "📷 Bild-Upload:",
-                    imageUrl: compressedBase64,
-                    user: chatUser,
-                    createdAt: serverTimestamp()
-                }).catch(err => console.error("Fehler beim Senden des komprimierten Bildes: ", err));
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-        input.value = "";
-    };
 
     window.handleKeyPress = function(e) {
         if (e.key === 'Enter') {
