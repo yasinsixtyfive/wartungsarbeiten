@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#070b14">
-<title>Yasin Özer • Wartungsarbeiten & Hub</title>
+<title>Wartungsarbeiten</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
@@ -205,15 +205,14 @@ h1{
   z-index: 1000;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  transition: all 0.25s ease;
+}
+
+/* Unsichtbar und nicht klickbar im eingeklappten Zustand */
+.chat-widget.collapsed {
   transform: translateY(20px);
   opacity: 0;
   pointer-events: none;
-  transition: all 0.25s ease;
-}
-.chat-widget.open {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
 }
 
 @media(max-width: 768px) {
@@ -451,20 +450,19 @@ h1{
 </main>
 
 <!-- TOAST BENACHRICHTIGUNG -->
-<div class="toast-notification" id="toastNotification">🗑️ Nachricht gelöscht</div>
+<div class="toast-notification" id="toastNotification">🗑️ Nachricht moderiert</div>
 
 <!-- FLOATING CHAT BUBBLE -->
 <button class="chat-toggle-btn" onclick="toggleChat()">
   💬 Schreib mir
 </button>
 
-<!-- CHAT SCHUBLADE -->
-<div class="chat-widget" id="chatWidget">
+<!-- CHAT SCHUBLADE (Standardmäßig eingeklappt via .collapsed) -->
+<div class="chat-widget collapsed" id="chatWidget" aria-hidden="true">
     <div class="chat-header">
         <span>💬 Schreib mir & Pinnwand</span>
         <div style="display:flex; gap:10px; align-items:center;">
             <span class="change-name" id="userNameLabel" onclick="requestNameChange()" title="Namen ändern"></span>
-            <span onclick="toggleChat()" style="cursor:pointer; font-size:14px; color:#94a3b8;" title="Schließen">✕</span>
         </div>
     </div>
 
@@ -538,10 +536,14 @@ h1{
         }
     });
 
+    // Toggle-Funktion: Schaltet ausschließlich die Klasse .collapsed und aria-hidden um
     window.toggleChat = function() {
         const widget = document.getElementById("chatWidget");
-        widget.classList.toggle("open");
-        if (widget.classList.contains("open")) {
+        widget.classList.toggle("collapsed");
+        const isCollapsed = widget.classList.contains("collapsed");
+        widget.setAttribute("aria-hidden", isCollapsed);
+        
+        if (!isCollapsed) {
             const list = document.getElementById("messagesList");
             list.scrollTop = list.scrollHeight;
             if (chatUser) document.getElementById("messageInput").focus();
@@ -583,7 +585,7 @@ h1{
         return name.replace(/[^a-zA-Z0-9äöüÄÖÜß _-]/g, "").trim().substring(0, 16);
     }
 
-    // ERWEITERT: Erkennt jetzt auch YouTube Shorts (/shorts/)!
+    // YouTube-Erkennung inklusive Shorts (/shorts/)
     function getYouTubeEmbedUrl(text) {
         const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([^#\&\?\s]{11})/;
         const match = text.match(regExp);
@@ -604,7 +606,7 @@ h1{
 
     window.handleOwnerLogout = async function() {
         if (heartbeatInterval) clearInterval(heartbeatInterval);
-        if (typingTimeout) clearTimeout(typingTimeout);
+        if (typingTimeout) clearInterval(typingTimeout);
         isOwner = false;
         try {
             await setDoc(doc(db, "presence", "owner"), { lastActive: new Date(0) }, { merge: true });
@@ -687,14 +689,14 @@ h1{
         statusText.innerHTML = `<span class="dot amber"></span>Yasin · Kaffeepause`;
     });
 
-    // Twitch-Style Soft-Delete: Aktualisiert das Dokument, statt es zu löschen
+    // Soft-Delete (Twitch-Mod-Modus)
     window.deleteMessage = async function(msgId) {
         try {
             await updateDoc(doc(db, "chatMessages", msgId), {
                 text: "Nachricht gelöscht",
                 deleted: true
             });
-            showToast("🗑️ Nachricht moderiert");
+            showToast("🗑️️ Nachricht moderiert");
         } catch (e) {
             console.error("Moderations-Fehler:", e);
             alert("Fehler beim Moderieren. Bist du als Owner angemeldet?");
@@ -745,7 +747,6 @@ h1{
 
             div.appendChild(msgHeader);
 
-            // Wenn gelöscht, nur den grauen Text anzeigen, ansonsten Inhalt & evtl. Player
             if (data.deleted) {
                 const deletedSpan = document.createElement("span");
                 deletedSpan.style.color = "#64748b";
