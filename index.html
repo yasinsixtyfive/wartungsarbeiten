@@ -186,7 +186,7 @@ h1{
 .chat-header {
   background: rgba(30, 41, 59, 0.9);
   padding: 10px 14px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
@@ -312,7 +312,7 @@ h1{
 }
 
 /* ================================
-   MOBILE SCROLL FIX (FINAL REPARIERT)
+   MOBILE SCROLL FIX
    ================================ */
 @media (max-width: 768px) {
   html {
@@ -442,11 +442,11 @@ h1{
     let heartbeatInterval = null;
     let typingTimeout = null;
 
-    // Hilfsfunktion: Erkennt YouTube-Links
+    // Hilfsfunktion: Erkennt YouTube-Links (auch mit Text davor/dahinter)
     function getYouTubeEmbedUrl(text) {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([^#\&\?\s]{11})/;
         const match = text.match(regExp);
-        return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+        return match ? `https://www.youtube.com/embed/${match[1]}` : null;
     }
 
     window.onload = function() {
@@ -462,18 +462,25 @@ h1{
     };
 
     // ==========================================
-    // ONLINE-STATUS & TIPP-STATUS TRACKING
+    // ONLINE-STATUS & ZEIT-TRACKING (KWICK-STIL)
     // ==========================================
     function startHeartbeat() {
         if (!chatUser) return;
         
+        let loginTime = sessionStorage.getItem("yasin_login_time");
+        if (!loginTime) {
+            loginTime = Date.now();
+            sessionStorage.setItem("yasin_login_time", loginTime);
+        }
+
         if (heartbeatInterval) clearInterval(heartbeatInterval);
 
         async function sendHeartbeat() {
             try {
                 await setDoc(doc(db, "onlineUsers", chatUser), {
                     user: chatUser,
-                    lastActive: serverTimestamp()
+                    lastActive: serverTimestamp(),
+                    loginTime: Number(loginTime)
                 }, { merge: true });
             } catch (e) {
                 console.error("Fehler beim Online-Status-Update:", e);
@@ -544,10 +551,11 @@ h1{
             return;
         }
         if (chatUser && chatUser !== val) {
-            deleteDoc(doc(db, "onlineUsers", chatUser)); // Alten Online-Status löschen
+            deleteDoc(doc(db, "onlineUsers", chatUser));
         }
         chatUser = val;
         localStorage.setItem("yasin_chat_username", chatUser);
+        sessionStorage.removeItem("yasin_login_time");
         document.getElementById("nameModal").classList.add("hidden");
         updateUserLabel();
         startHeartbeat();
@@ -557,11 +565,18 @@ h1{
     // ==========================================
     // REALTIME LISTENERS (NACHRICHTEN & ONLINE-USER)
     // ==========================================
-    const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "asc"), limit(50));
+    // GEFIXT: Holt die 50 NEUESTEN Nachrichten und dreht sie fürs Rendern um
+    const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "desc"), limit(50));
     onSnapshot(chatQuery, (snapshot) => {
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
-        snapshot.forEach((doc) => {
+
+        // Umdrehen, damit die neuste Nachricht unten erscheint
+        const docs = [];
+        snapshot.forEach(docSnap => docs.push(docSnap));
+        docs.reverse();
+
+        docs.forEach((doc) => {
             const data = doc.data();
             const div = document.createElement("div");
             div.className = "message";
@@ -619,7 +634,7 @@ h1{
     const onlineQuery = query(collection(db, "onlineUsers"));
     onSnapshot(onlineQuery, (snapshot) => {
         const now = Date.now();
-        const activeUsers = [];
+        const activeUsersDetails = [];
         const typingUsers = [];
 
         snapshot.forEach((docSnap) => {
@@ -630,11 +645,26 @@ h1{
                 const lastActiveTime = data.lastActive.toDate().getTime();
                 if (now - lastActiveTime < 40000) {
                     isOnline = true;
-                    activeUsers.push(data.user);
+                    
+                    let durationText = "seit 1 Min.";
+                    if (data.loginTime) {
+                        const diffMin = Math.floor((now - data.loginTime) / 60000);
+                        if (diffMin < 1) {
+                            durationText = "seit wenigen Sek.";
+                        } else if (diffMin === 1) {
+                            durationText = "seit 1 Min.";
+                        } else if (diffMin < 60) {
+                            durationText = `seit ${diffMin} Min.`;
+                        } else {
+                            const hrs = Math.floor(diffMin / 60);
+                            durationText = `seit ${hrs} Std.`;
+                        }
+                    }
+                    activeUsersDetails.push(`${data.user} (${durationText})`);
                 }
             } else {
                 isOnline = true;
-                activeUsers.push(data.user);
+                activeUsersDetails.push(`${data.user}`);
             }
 
             if (isOnline && data.isTyping && data.user !== chatUser) {
@@ -643,8 +673,8 @@ h1{
         });
 
         const headerTitle = document.querySelector(".chat-header span:first-child");
-        if (activeUsers.length > 0) {
-            headerTitle.innerHTML = `💬 Live-Testchat <span style="color: #34d399; font-size: 10px; margin-left: 6px; font-weight: normal;">● ${activeUsers.length} online (${activeUsers.join(", ")})</span>`;
+        if (activeUsersDetails.length > 0) {
+            headerTitle.innerHTML = `💬 Live-Testchat <span style="color: #34d399; font-size: 9px; margin-left: 4px; font-weight: normal;">● ${activeUsersDetails.length} online: ${activeUsersDetails.join(", ")}</span>`;
         } else {
             headerTitle.innerHTML = `💬 Live-Testchat`;
         }
@@ -664,7 +694,7 @@ h1{
     });
 
     // ==========================================
-    // CHAT SENDEN-LOGIK & BILD-UPLOAD (KOMPIMIERT)
+    // CHAT SENDEN-LOGIK & BILD-UPLOAD
     // ==========================================
     window.checkNameAndSend = function() {
         if (!chatUser) {
