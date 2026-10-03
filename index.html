@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#070b14">
-<title>Wartungsarbeiten</title>
+<title>Yasin Özer • Wartungsarbeiten</title>
 <meta name="description" content="Persönliche Wartungsseite und Live-Pinnwand von Yasin Özer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
@@ -295,7 +295,7 @@ h1{
 .delete-btn:hover { color: #ef4444; }
 
 /* ==========================================
-   MSN WACKEL-ANIMATION (VOLLBILD)
+   MSN WACKEL-ANIMATION & TOAST DESIGN
    ========================================== */
 @keyframes slideInUp {
   from { transform: translateY(20px); opacity: 0; }
@@ -526,12 +526,15 @@ h1{
     </div>
 </div>
 
-<!-- AUDIO ELEMENT -->
+<!-- AUDIO ELEMENTE (Countdown & Nudge Sound) -->
 <audio id="countdownAudio" preload="auto">
     <source src="countdown.mp3" type="audio/mpeg">
 </audio>
+<audio id="nudgeAudio" preload="auto">
+    <source src="nudge.mp3" type="audio/mpeg">
+</audio>
 
-<!-- FIREBASE & LOGIK (MIT ECHTEM NETWORK-NUDGE) -->
+<!-- FIREBASE & LOGIK -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -562,7 +565,7 @@ h1{
     let heartbeatInterval = null;
     const OWNER_UID = "p952EuvWWFVkJALp1666OkRXuXC2";
     let lastChatDocs = [];
-    let lastSeenNudgeTime = Date.now(); // Verhindert, dass alte Anstupser beim Laden sofort zünden
+    let lastSeenNudgeTime = Date.now();
 
     if (auth) {
         signInAnonymously(auth).catch(err => console.error("Anonym Auth Fehler:", err));
@@ -741,7 +744,7 @@ h1{
     }
 
     /* ==========================================
-       TOAST & MSN NUDGE LOGIK (FIREBASE REALTIME)
+       TOAST, MSN NUDGE & AUDIO LOGIK
        ========================================== */
     window.showToast = function(text, isError = false) {
         const toast = document.getElementById("toastNotification");
@@ -760,13 +763,20 @@ h1{
         }, 3000);
     };
 
-    // Lokale Ausführung des Vollbild-Shakes bei einem echten Anstupser
+    // Führt den Bildschirm-Shake und den Anstups-Sound aus
     function executeLocalShake(senderName) {
         const target = document.body;
         if (!target) return;
         
+        // Sound abspielen
+        const nudgeAudio = document.getElementById("nudgeAudio");
+        if (nudgeAudio) {
+            nudgeAudio.currentTime = 0;
+            nudgeAudio.play().catch(e => console.log("Audio-Autoplay blockiert:", e));
+        }
+
         target.classList.remove("shake-screen");
-        void target.offsetWidth; // Erzwingt Reflow für iOS / Android
+        void target.offsetWidth; 
         
         target.classList.add("shake-screen");
         window.showToast("👋 " + senderName + " hat dich angestupst!");
@@ -776,7 +786,7 @@ h1{
         }, 400);
     }
 
-    // 1. Wenn du den Button klickst, senden wir das Signal an Firebase
+    // Anstupser abschicken an Firebase
     window.sendNudgeAction = async function() {
         if (!chatUser && !isOwner) {
             window.showToast("Bitte zuerst Namen festlegen!", true);
@@ -797,7 +807,7 @@ h1{
         }
     };
 
-    // 2. Wir lauschen in Echtzeit auf neue Anstupser von anderen
+    // Auf Anstupser von anderen lauschen
     if (db) {
         const nudgeQuery = query(collection(db, "nudges"), orderBy("createdAt", "desc"), limit(1));
         onSnapshot(nudgeQuery, (snapshot) => {
@@ -805,15 +815,13 @@ h1{
                 const data = docSnap.data();
                 if (data.createdAt && typeof data.createdAt.toDate === "function") {
                     const nudgeTime = data.createdAt.toDate().getTime();
-                    // Wenn der Anstupser frisch ist (unter 6 Sek. alt) und neuer als unsere letzte Zeit
                     if (nudgeTime > lastSeenNudgeTime && (Date.now() - nudgeTime < 6000)) {
                         lastSeenNudgeTime = nudgeTime;
-                        // Nur wackeln, wenn WIR NICHT selbst der Absender waren!
                         if (data.senderUid !== currentUid) {
                             executeLocalShake(data.sender);
                         }
                     } else if (nudgeTime > lastSeenNudgeTime) {
-                        lastSeenNudgeTime = nudgeTime; // Nur Aktualisierung beim Laden
+                        lastSeenNudgeTime = nudgeTime;
                     }
                 }
             });
@@ -930,7 +938,7 @@ h1{
 
     window.requestNameChange = function() {
         if (isOwner) return;
-        document.getElementById("nameModal").classList.remove("hidden");
+        document.getElementById("nameModal").classList.add("hidden");
         document.getElementById("popupNameInput").value = chatUser || "";
         document.getElementById("popupNameInput").focus();
     };
