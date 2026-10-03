@@ -295,7 +295,7 @@ h1{
 .delete-btn:hover { color: #ef4444; }
 
 /* ==========================================
-   MSN WACKEL-ANIMATION & TOAST DESIGN
+   MSN WACKEL-ANIMATION & PROFI FADE-IN/OUT
    ========================================== */
 @keyframes slideInUp {
   from { transform: translateY(20px); opacity: 0; }
@@ -310,6 +310,29 @@ h1{
 
 .shake-screen {
   animation: msnShakeWindow 0.4s ease-in-out !important;
+}
+
+/* 🥊 PROFI GIF OVERLAY MIT FADE-IN & FADE-OUT */
+.nudge-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 3000;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.nudge-overlay.play-knock {
+  opacity: 1;
+  transform: scale(1);
+}
+.nudge-overlay img {
+  width: min(280px, 75vw);
+  height: auto;
+  mix-blend-mode: screen; /* Macht den schwarzen GIF-Hintergrund unsichtbar */
+  filter: drop-shadow(0 25px 40px rgba(0,0,0,0.9));
 }
 
 .toast-notification {
@@ -484,6 +507,11 @@ h1{
 </section>
 </main>
 
+<!-- GIF OVERLAY FÜR DIE ANIMIERTE FAUST -->
+<div id="nudgeOverlay" class="nudge-overlay">
+    <img id="nudgeGifImg" src="knock_fist.gif" alt="Animierte Knöchel-Klopf-Faust">
+</div>
+
 <!-- TOAST BENACHRICHTIGUNG -->
 <div id="toastNotification" class="toast-notification" aria-live="polite"></div>
 
@@ -526,12 +554,12 @@ h1{
     </div>
 </div>
 
-<!-- AUDIO ELEMENTE (Countdown & Nudge Sound) -->
+<!-- AUDIO ELEMENTE -->
 <audio id="countdownAudio" preload="auto">
     <source src="countdown.mp3" type="audio/mpeg">
 </audio>
 <audio id="nudgeAudio" preload="auto">
-    <source src="nudge.mp3" type="audio/mpeg">
+    <source src="knock_sound.mp3" type="audio/mpeg">
 </audio>
 
 <!-- FIREBASE & LOGIK -->
@@ -744,7 +772,7 @@ h1{
     }
 
     /* ==========================================
-       TOAST, MSN NUDGE & AUDIO LOGIK
+       TOAST, MSN NUDGE, FADE & AUDIO LOGIK
        ========================================== */
     window.showToast = function(text, isError = false) {
         const toast = document.getElementById("toastNotification");
@@ -763,23 +791,39 @@ h1{
         }, 3000);
     };
 
-    // Führt den Bildschirm-Shake und den Anstups-Sound aus
+    // Führt das professionelle Klopfen mit Fade-in, Sound, GIF-Reset und Shake aus
     function executeLocalShake(senderName) {
         const target = document.body;
+        const overlay = document.getElementById("nudgeOverlay");
+        const gifImg = document.getElementById("nudgeGifImg");
         if (!target) return;
         
-        // Sound abspielen
+        // 1. Klopf-Sound abspielen
         const nudgeAudio = document.getElementById("nudgeAudio");
         if (nudgeAudio) {
             nudgeAudio.currentTime = 0;
-            nudgeAudio.play().catch(e => console.log("Audio-Autoplay blockiert:", e));
+            nudgeAudio.play().catch(e => console.log("Audio blockiert:", e));
         }
 
+        // 2. GIF-Reset (damit es von Frame 1 startet) & Fade-In triggern
+        if (overlay && gifImg) {
+            const cleanSrc = gifImg.src.split('?')[0];
+            gifImg.src = cleanSrc + '?t=' + Date.now();
+            
+            overlay.classList.add("play-knock");
+
+            // Nach 700ms das Overlay mit Fade-out wieder ausblenden
+            setTimeout(() => {
+                overlay.classList.remove("play-knock");
+            }, 700);
+        }
+
+        // 3. Bildschirm wackeln lassen
         target.classList.remove("shake-screen");
         void target.offsetWidth; 
         
         target.classList.add("shake-screen");
-        window.showToast("👋 " + senderName + " hat dich angestupst!");
+        window.showToast("👋 " + senderName + " hat gegen den Monitor geklopft!");
         
         setTimeout(() => {
             target.classList.remove("shake-screen");
