@@ -295,7 +295,7 @@ h1{
 .delete-btn:hover { color: #ef4444; }
 
 /* ==========================================
-   MSN WACKEL-ANIMATION & PROFI FADE-IN/OUT
+   MSN WACKEL-ANIMATION & PERFEKT SYNCHRONISIERTES GIF
    ========================================== */
 @keyframes slideInUp {
   from { transform: translateY(20px); opacity: 0; }
@@ -309,10 +309,10 @@ h1{
 }
 
 .shake-screen {
-  animation: msnShakeWindow 0.4s ease-in-out !important;
+  animation: msnShakeWindow 0.5s ease-in-out !important;
 }
 
-/* 🥊 PROFI GIF OVERLAY MIT FADE-IN & FADE-OUT */
+/* 🥊 PERFEKTES GIF OVERLAY MIT LÄNGERER SYNCHRONISIERTER ANZEIGE */
 .nudge-overlay {
   position: fixed;
   inset: 0;
@@ -322,7 +322,7 @@ h1{
   pointer-events: none;
   opacity: 0;
   transform: scale(0.85);
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .nudge-overlay.play-knock {
   opacity: 1;
@@ -507,7 +507,7 @@ h1{
 </section>
 </main>
 
-<!-- GIF OVERLAY FÜR DIE ANIMIERTE FAUST -->
+<!-- GIF OVERLAY FÜR DIE KLOPF-FAUST -->
 <div id="nudgeOverlay" class="nudge-overlay">
     <img id="nudgeGifImg" src="knock_fist.gif" alt="Animierte Knöchel-Klopf-Faust">
 </div>
@@ -525,8 +525,10 @@ h1{
     <div class="chat-messages" id="messagesList" aria-live="polite"></div>
     <div id="typingIndicator" style="font-size: 11px; color: #94a3b8; padding: 4px 12px; font-style: italic; min-height: 20px; background: rgba(15, 23, 42, 0.4);"></div>
     <div class="chat-input-area">
-        <!-- MSN Anstups-Button -->
-        <button type="button" class="nudge-btn" onclick="sendNudgeAction()" title="Anstupsen (Bildschirm wackeln lassen)">👋</button>
+        <!-- 📳 MSN Shaker Button -->
+        <button type="button" class="nudge-btn" onclick="sendShakerAction()" title="MSN Shaker (Nur Bildschirm wackeln)">📳</button>
+        <!-- ✊ Knöchel Klopfen Button -->
+        <button type="button" class="nudge-btn" onclick="sendKnockAction()" title="Knöchel-Klopfen (Mit animierter Faust & Sound)">✊</button>
         <input type="text" id="messageInput" maxlength="500" placeholder="Nachricht schreiben..." onfocus="checkNameBeforeWriting()" onkeypress="handleKeyPress(event)">
         <button class="send-btn" onclick="checkNameAndSend()">Senden</button>
     </div>
@@ -558,7 +560,7 @@ h1{
 <audio id="countdownAudio" preload="auto">
     <source src="countdown.mp3" type="audio/mpeg">
 </audio>
-<audio id="nudgeAudio" preload="auto">
+<audio id="knockAudio" preload="auto">
     <source src="knock_sound.mp3" type="audio/mpeg">
 </audio>
 
@@ -772,7 +774,7 @@ h1{
     }
 
     /* ==========================================
-       TOAST, MSN NUDGE, FADE & AUDIO LOGIK
+       TOAST, SHAKER & KLOPF-LOGIK
        ========================================== */
     window.showToast = function(text, isError = false) {
         const toast = document.getElementById("toastNotification");
@@ -791,47 +793,60 @@ h1{
         }, 3000);
     };
 
-    // Führt das professionelle Klopfen mit Fade-in, Sound, GIF-Reset und Shake aus
-    function executeLocalShake(senderName) {
+    // 1. Reiner Shaker (nur Bildschirm wackeln)
+    function executeLocalShaker(senderName) {
+        const target = document.body;
+        if (!target) return;
+
+        target.classList.remove("shake-screen");
+        void target.offsetWidth; 
+        target.classList.add("shake-screen");
+        window.showToast("📳 " + senderName + " hat den Bildschirm angestupst!");
+        
+        setTimeout(() => {
+            target.classList.remove("shake-screen");
+        }, 500);
+    }
+
+    // 2. Wuchtiges Knöchel-Klopfen (GIF + Sound + Shake perfekt synchronisiert)
+    function executeLocalKnock(senderName) {
         const target = document.body;
         const overlay = document.getElementById("nudgeOverlay");
         const gifImg = document.getElementById("nudgeGifImg");
         if (!target) return;
         
-        // 1. Klopf-Sound abspielen
-        const nudgeAudio = document.getElementById("nudgeAudio");
-        if (nudgeAudio) {
-            nudgeAudio.currentTime = 0;
-            nudgeAudio.play().catch(e => console.log("Audio blockiert:", e));
+        // Sound abspielen
+        const knockAudio = document.getElementById("knockAudio");
+        if (knockAudio) {
+            knockAudio.currentTime = 0;
+            knockAudio.play().catch(e => console.log("Audio blockiert:", e));
         }
 
-        // 2. GIF-Reset (damit es von Frame 1 startet) & Fade-In triggern
+        // GIF-Reset & perfekt getimtes Fade-In/Out (1400ms deckt den Sound komplett ab)
         if (overlay && gifImg) {
             const cleanSrc = gifImg.src.split('?')[0];
             gifImg.src = cleanSrc + '?t=' + Date.now();
             
             overlay.classList.add("play-knock");
 
-            // Nach 700ms das Overlay mit Fade-out wieder ausblenden
             setTimeout(() => {
                 overlay.classList.remove("play-knock");
-            }, 700);
+            }, 1400);
         }
 
-        // 3. Bildschirm wackeln lassen
+        // Bildschirm kräftig wackeln lassen
         target.classList.remove("shake-screen");
         void target.offsetWidth; 
-        
         target.classList.add("shake-screen");
-        window.showToast("👋 " + senderName + " hat gegen den Monitor geklopft!");
+        window.showToast("✊ " + senderName + " hat mit den Knöcheln geklopft!");
         
         setTimeout(() => {
             target.classList.remove("shake-screen");
-        }, 400);
+        }, 500);
     }
 
-    // Anstupser abschicken an Firebase
-    window.sendNudgeAction = async function() {
+    // Aktionen abschicken an Firebase
+    window.sendShakerAction = async function() {
         if (!chatUser && !isOwner) {
             window.showToast("Bitte zuerst Namen festlegen!", true);
             checkNameBeforeWriting();
@@ -841,17 +856,37 @@ h1{
         try {
             await addDoc(collection(db, "nudges"), {
                 sender: sender,
+                type: "shaker",
                 createdAt: serverTimestamp(),
                 senderUid: currentUid
             });
-            window.showToast("👋 Du hast jemanden angestupst!");
+            window.showToast("📳 Du hast einen Shaker gesendet!");
         } catch (e) {
-            console.error("Anstups-Fehler:", e);
-            window.showToast("Anstupsen fehlgeschlagen.", true);
+            window.showToast("Fehler beim Senden.", true);
         }
     };
 
-    // Auf Anstupser von anderen lauschen
+    window.sendKnockAction = async function() {
+        if (!chatUser && !isOwner) {
+            window.showToast("Bitte zuerst Namen festlegen!", true);
+            checkNameBeforeWriting();
+            return;
+        }
+        const sender = isOwner ? "Yasin Dev" : chatUser;
+        try {
+            await addDoc(collection(db, "nudges"), {
+                sender: sender,
+                type: "knock",
+                createdAt: serverTimestamp(),
+                senderUid: currentUid
+            });
+            window.showToast("✊ Du hast gegen den Monitor geklopft!");
+        } catch (e) {
+            window.showToast("Fehler beim Senden.", true);
+        }
+    };
+
+    // Auf Live-Signale von anderen lauschen
     if (db) {
         const nudgeQuery = query(collection(db, "nudges"), orderBy("createdAt", "desc"), limit(1));
         onSnapshot(nudgeQuery, (snapshot) => {
@@ -862,7 +897,11 @@ h1{
                     if (nudgeTime > lastSeenNudgeTime && (Date.now() - nudgeTime < 6000)) {
                         lastSeenNudgeTime = nudgeTime;
                         if (data.senderUid !== currentUid) {
-                            executeLocalShake(data.sender);
+                            if (data.type === "knock") {
+                                executeLocalKnock(data.sender);
+                            } else {
+                                executeLocalShaker(data.sender);
+                            }
                         }
                     } else if (nudgeTime > lastSeenNudgeTime) {
                         lastSeenNudgeTime = nudgeTime;
@@ -876,9 +915,7 @@ h1{
         try {
             await updateDoc(doc(db, "chatMessages", msgId), { text: "Nachricht gelöscht", deleted: true });
             window.showToast("Nachricht gelöscht");
-        } catch (e) {
-            console.error("Moderations-Fehler:", e);
-        }
+        } catch (e) {}
     };
 
     function renderMessages(docs) {
@@ -1033,8 +1070,7 @@ h1{
             input.value = "";
             window.showToast("Nachricht gesendet!");
         } catch (e) {
-            console.error("Sende-Fehler:", e);
-            window.showToast("Senden fehlgeschlagen! Verbindung prüfen.", true);
+            window.showToast("Senden fehlgeschlagen!", true);
         }
     }
 
