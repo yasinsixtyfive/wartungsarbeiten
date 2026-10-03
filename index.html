@@ -295,7 +295,7 @@ h1{
 .delete-btn:hover { color: #ef4444; }
 
 /* ==========================================
-   MSN WACKEL-ANIMATION & SYNCHRONISIERTES GIF
+   MSN WACKEL-ANIMATION & TRANSPARENTES GIF OVERLAY
    ========================================== */
 @keyframes slideInUp {
   from { transform: translateY(20px); opacity: 0; }
@@ -312,7 +312,7 @@ h1{
   animation: msnShakeWindow 0.5s ease-in-out !important;
 }
 
-/* 🥊 PERFEKTES GIF OVERLAY MIT LANGERER ANZEIGE & FADE */
+/* 🥊 GIF OVERLAY (FÜR NATIV TRANSPARENTE GIFs OPTIMIERT) */
 .nudge-overlay {
   position: fixed;
   inset: 0;
@@ -331,7 +331,6 @@ h1{
 .nudge-overlay img {
   width: min(280px, 75vw);
   height: auto;
-  mix-blend-mode: screen; /* Macht den schwarzen GIF-Hintergrund unsichtbar */
   filter: drop-shadow(0 25px 40px rgba(0,0,0,0.9));
 }
 
@@ -1021,7 +1020,7 @@ h1{
 
     window.requestNameChange = function() {
         if (isOwner) return;
-        document.getElementById("nameModal").classList.add("hidden");
+        document.getElementById("nameModal").classList.remove("hidden"); // FIX: Korrekt auf remove gesetzt!
         document.getElementById("popupNameInput").value = chatUser || "";
         document.getElementById("popupNameInput").focus();
     };
