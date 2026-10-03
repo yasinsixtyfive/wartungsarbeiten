@@ -63,6 +63,7 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.035));
   box-shadow:0 30px 100px rgba(0,0,0,.5);
   margin: auto 0;
+  transition: transform 0.05s ease;
 }
 .card{
   position:relative;
@@ -295,7 +296,7 @@ h1{
 .delete-btn:hover { color: #ef4444; }
 
 /* ==========================================
-   MSN WACKEL-ANIMATION & TRANSPARENTES GIF OVERLAY
+   MSN WACKEL-ANIMATION & GIF OVERLAY
    ========================================== */
 @keyframes slideInUp {
   from { transform: translateY(20px); opacity: 0; }
@@ -304,15 +305,15 @@ h1{
 
 @keyframes msnShakeWindow {
   0%, 100% { transform: translate(0, 0); }
-  15%, 45%, 75% { transform: translate(-10px, -6px); }
-  30%, 60%, 90% { transform: translate(10px, 6px); }
+  15%, 45%, 75% { transform: translate(-12px, -8px); }
+  30%, 60%, 90% { transform: translate(12px, 8px); }
 }
 
 .shake-screen {
-  animation: msnShakeWindow 0.5s ease-in-out !important;
+  animation: msnShakeWindow 0.4s ease-in-out !important;
 }
 
-/* 🥊 GIF OVERLAY (FÜR NATIV TRANSPARENTE GIFs OPTIMIERT) */
+/* 🥊 GIF OVERLAY */
 .nudge-overlay {
   position: fixed;
   inset: 0;
@@ -775,7 +776,7 @@ h1{
     }
 
     /* ==========================================
-       TOAST, SHAKER & KLOPF-LOGIK
+       TOAST, ROBUSTE SHAKER & KLOPF-LOGIK
        ========================================== */
     window.showToast = function(text, isError = false) {
         const toast = document.getElementById("toastNotification");
@@ -794,27 +795,34 @@ h1{
         }, 3000);
     };
 
-    // 1. Reiner Shaker (nur Bildschirm wackeln)
-    function executeLocalShaker(senderName) {
-        const target = document.body;
-        if (!target) return;
-
-        target.classList.remove("shake-screen");
-        void target.offsetWidth; 
-        target.classList.add("shake-screen");
-        window.showToast("👋 " + senderName + " hat angestupst!");
-        
+    // Zuverlässige Shake-Funktion für den Container (.shell)
+    function triggerContainerShake() {
+        const shell = document.querySelector(".shell");
+        if (!shell) return;
+        shell.classList.remove("shake-screen");
+        void shell.offsetWidth; // Reflow erzwingen
+        shell.classList.add("shake-screen");
         setTimeout(() => {
-            target.classList.remove("shake-screen");
+            shell.classList.remove("shake-screen");
         }, 500);
     }
 
-    // 2. Wuchtiges Knöchel-Klopfen (GIF + Sound + Shake perfekt synchronisiert)
+    // 1. Reiner Shaker (mit Sound + Container-Shake)
+    function executeLocalShaker(senderName) {
+        const knockAudio = document.getElementById("knockAudio");
+        if (knockAudio) {
+            knockAudio.currentTime = 0;
+            knockAudio.play().catch(e => console.log("Audio blockiert:", e));
+        }
+
+        triggerContainerShake();
+        window.showToast("👋 " + senderName + " hat angestupst!");
+    }
+
+    // 2. Wuchtiges Knöchel-Klopfen (GIF + Sound + Container-Shake perfekt synchronisiert)
     function executeLocalKnock(senderName) {
-        const target = document.body;
         const overlay = document.getElementById("nudgeOverlay");
         const gifImg = document.getElementById("nudgeGifImg");
-        if (!target) return;
         
         // Sound abspielen
         const knockAudio = document.getElementById("knockAudio");
@@ -823,7 +831,7 @@ h1{
             knockAudio.play().catch(e => console.log("Audio blockiert:", e));
         }
 
-        // GIF-Reset & exakt getimtes Fade-In/Out (1600ms deckt den vollen Sound ab)
+        // GIF-Reset & exakt getimtes Fade-In/Out
         if (overlay && gifImg) {
             const cleanSrc = gifImg.src.split('?')[0];
             gifImg.src = cleanSrc + '?t=' + Date.now();
@@ -835,15 +843,9 @@ h1{
             }, 1600);
         }
 
-        // Bildschirm kräftig wackeln lassen
-        target.classList.remove("shake-screen");
-        void target.offsetWidth; 
-        target.classList.add("shake-screen");
+        // Kräftig wackeln lassen
+        triggerContainerShake();
         window.showToast("✊ " + senderName + " hat gegen den Monitor geklopft!");
-        
-        setTimeout(() => {
-            target.classList.remove("shake-screen");
-        }, 600);
     }
 
     // Aktionen abschicken an Firebase
@@ -1020,7 +1022,7 @@ h1{
 
     window.requestNameChange = function() {
         if (isOwner) return;
-        document.getElementById("nameModal").classList.remove("hidden"); // FIX: Korrekt auf remove gesetzt!
+        document.getElementById("nameModal").classList.remove("hidden");
         document.getElementById("popupNameInput").value = chatUser || "";
         document.getElementById("popupNameInput").focus();
     };
