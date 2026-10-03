@@ -776,7 +776,7 @@ h1{
     }
 
     /* ==========================================
-       TOAST, ROBUSTE SHAKER & KLOPF-LOGIK
+       TOAST, SHAKER & KLOPF-LOGIK
        ========================================== */
     window.showToast = function(text, isError = false) {
         const toast = document.getElementById("toastNotification");
@@ -795,19 +795,19 @@ h1{
         }, 3000);
     };
 
-    // Zuverlässige Shake-Funktion für den Container (.shell)
+    // Robuste Shake-Funktion für den Container (.shell)
     function triggerContainerShake() {
         const shell = document.querySelector(".shell");
         if (!shell) return;
         shell.classList.remove("shake-screen");
-        void shell.offsetWidth; // Reflow erzwingen
+        void shell.offsetWidth; 
         shell.classList.add("shake-screen");
         setTimeout(() => {
             shell.classList.remove("shake-screen");
         }, 500);
     }
 
-    // 1. Reiner Shaker (mit Sound + Container-Shake)
+    // 1. Reiner Shaker (nur Shaker lässt den Bildschirm wackeln + Sound)
     function executeLocalShaker(senderName) {
         const knockAudio = document.getElementById("knockAudio");
         if (knockAudio) {
@@ -819,7 +819,7 @@ h1{
         window.showToast("👋 " + senderName + " hat angestupst!");
     }
 
-    // 2. Wuchtiges Knöchel-Klopfen (GIF + Sound + Container-Shake perfekt synchronisiert)
+    // 2. Wuchtiges Knöchel-Klopfen (GIF + Sound, OHNE Bildschirm-Wackeln)
     function executeLocalKnock(senderName) {
         const overlay = document.getElementById("nudgeOverlay");
         const gifImg = document.getElementById("nudgeGifImg");
@@ -843,8 +843,6 @@ h1{
             }, 1600);
         }
 
-        // Kräftig wackeln lassen
-        triggerContainerShake();
         window.showToast("✊ " + senderName + " hat gegen den Monitor geklopft!");
     }
 
