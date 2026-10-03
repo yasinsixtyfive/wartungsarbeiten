@@ -4,10 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#070b14">
-<title>Wartungsarbeiten</title>
+<title>Yasin Özer • Wartungsarbeiten</title>
+<meta name="description" content="Persönliche Wartungsseite und Live-Pinnwand von Yasin Özer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
+/* ==========================================
+   CSS VARIABLEN & GRUNDEINSTELLUNGEN
+   ========================================== */
 :root{
   --bg:#070b14;
   --panel:rgba(13,19,32,.78);
@@ -42,6 +46,8 @@ body{
     linear-gradient(135deg,#050812,#0a1020 55%,#060a13);
   position: relative;
 }
+
+/* Hintergrund-Glow-Effekte mit sanfter Animation */
 body:before,body:after{
   content:"";position:fixed;border-radius:50%;filter:blur(70px);
   pointer-events:none;opacity:.28;animation:float 10s ease-in-out infinite alternate;
@@ -49,6 +55,7 @@ body:before,body:after{
 body:before{width:220px;height:220px;background:#38bdf8;top:-100px;left:-70px}
 body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120px;animation-delay:-4s}
 @keyframes float{to{transform:translate(30px,24px) scale(1.08)}}
+
 .shell{
   width:min(100%, 680px);
   position:relative;
@@ -69,6 +76,8 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   background:linear-gradient(180deg,rgba(15,23,42,.88),rgba(8,13,24,.88));
   backdrop-filter:blur(24px);
 }
+
+/* Kaffeetasse / Easter-Egg Animation */
 .hero-icon{
   width:110px;height:110px;
   margin:0 auto 16px;
@@ -94,6 +103,7 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
 .steam{animation:steam 2.7s ease-in-out infinite}
 .steam.two{animation-delay:.7s}
 @keyframes steam{0%,100%{opacity:.2;transform:translateY(2px)}50%{opacity:.9;transform:translateY(-7px)}}
+
 .badge{
   display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;
   background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.2);
@@ -101,6 +111,7 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
 }
 .badge i{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pulse 1.7s infinite}
 @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
+
 h1{
   width:100%;
   text-align:center;
@@ -118,6 +129,7 @@ h1{
   font-size: clamp(0.85rem, 3vw, 0.95rem);
   line-height:1.6;
 }
+
 .status-grid{
   width:100%;
   display:grid;
@@ -138,6 +150,7 @@ h1{
 .dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:4px; }
 .dot.green { background:var(--green); box-shadow:0 0 6px var(--green); }
 .dot.amber { background:var(--amber); box-shadow:0 0 6px var(--amber); }
+
 .note{
   width:100%;
   display:flex;
@@ -148,6 +161,7 @@ h1{
   border:1px solid rgba(56,189,248,.12);color:#a5b4fc;font-size:0.75rem;line-height:1.5
 }
 .note-icon{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:rgba(56,189,248,.1);color:var(--cyan)}
+
 .footer{
   width:100%;
   margin:16px auto 0;
@@ -159,6 +173,10 @@ h1{
   text-align:center;
 }
 .footer strong{color:#cbd5e1}
+
+/* ==========================================
+   CHAT UI & SCHUBLADE STYLING
+   ========================================== */
 .chat-launcher {
   position: fixed;
   bottom: 20px;
@@ -179,6 +197,7 @@ h1{
   transition: transform 0.2s ease;
 }
 .chat-launcher:hover { transform: scale(1.05); }
+
 .chat-widget {
   position: fixed;
   bottom: 84px;
@@ -205,6 +224,7 @@ h1{
   pointer-events: none;
   transform: translateY(12px) scale(0.97);
 }
+
 @media(max-width: 768px) {
   .chat-launcher { bottom: max(16px, env(safe-area-inset-bottom)); right: 16px; }
   .chat-widget {
@@ -216,6 +236,7 @@ h1{
     border-radius: 16px;
   }
 }
+
 .chat-header {
   background: rgba(30, 41, 59, 0.9);
   padding: 12px 14px;
@@ -274,6 +295,8 @@ h1{
   font-weight: bold;
 }
 .delete-btn:hover { color: #ef4444; }
+
+/* Toast Benachrichtigung */
 .toast-notification {
   position: fixed;
   bottom: 85px;
@@ -293,6 +316,7 @@ h1{
   pointer-events: none;
 }
 .toast-notification.show { opacity: 1; transform: translateY(0); }
+
 .chat-input-area {
   display: flex;
   padding: 10px;
@@ -321,6 +345,8 @@ h1{
   font-weight: 600;
 }
 .send-btn:hover { background: #2563eb; }
+
+/* Modals */
 .modal {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -377,12 +403,15 @@ h1{
 .hidden { display: none !important; }
 .change-name { font-size: 10px; color: #94a3b8; cursor: pointer; }
 .change-name:hover { color: #fff; text-decoration: underline; }
+
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{animation:none!important;scroll-behavior:auto!important}
 }
 </style>
 </head>
 <body>
+
+<!-- HAUPTSEITE / WARTUNGS-CONTAINER -->
 <main class="shell">
 <section class="card" aria-labelledby="title">
   <div class="hero-icon" onclick="playFinalCountdown()" title="Klick für The Final Countdown">
@@ -422,19 +451,25 @@ h1{
   </footer>
 </section>
 </main>
-<div class="toast-notification" id="toastNotification">Nachricht gelöscht</div>
-<button class="chat-launcher" id="chatLauncherBtn" type="button" aria-expanded="false">💬 Schreib mir</button>
+
+<!-- TOAST BENACHRICHTIGUNG -->
+<div class="toast-notification" id="toastNotification" aria-live="polite">Nachricht gelöscht</div>
+
+<!-- CHAT LAUNCHER & SCHUBLADE -->
+<button class="chat-launcher" id="chatLauncherBtn" type="button" aria-expanded="false" aria-controls="chatWidget">💬 Schreib mir</button>
 <div class="chat-widget collapsed" id="chatWidget" aria-hidden="true">
     <div class="chat-header">
         <span>💬 Schreib mir</span>
         <span class="change-name" id="userNameLabel" onclick="requestNameChange()" title="Namen ändern"></span>
     </div>
-    <div class="chat-messages" id="messagesList"></div>
+    <!-- Chat-Nachrichtenbereich mit ARIA live region für Screenreader -->
+    <div class="chat-messages" id="messagesList" aria-live="polite"></div>
     <div id="typingIndicator" style="font-size: 11px; color: #94a3b8; padding: 4px 12px; font-style: italic; min-height: 20px; background: rgba(15, 23, 42, 0.4);"></div>
     <div class="chat-input-area">
         <input type="text" id="messageInput" maxlength="500" placeholder="Nachricht schreiben..." onfocus="checkNameBeforeWriting()" onkeypress="handleKeyPress(event)">
         <button class="send-btn" onclick="checkNameAndSend()">Senden</button>
     </div>
+    <!-- Namens-Modal für Gäste -->
     <div class="modal hidden" id="nameModal">
         <div class="modal-content">
             <p style="margin: 0; font-size: 12px; color: #cbd5e1;">Wie möchtest du heißen?</p>
@@ -444,6 +479,8 @@ h1{
         </div>
     </div>
 </div>
+
+<!-- ADMIN / OWNER LOGIN MODAL -->
 <div class="modal screen-modal hidden" id="ownerLoginModal">
     <div class="modal-content">
         <p style="margin: 0 0 6px; font-size: 13px; color: #e2e8f0; font-weight: 600;">Entwickler-Login</p>
@@ -455,13 +492,18 @@ h1{
         <button onclick="document.getElementById('ownerLoginModal').classList.add('hidden')" style="background:#475569; margin-top:6px;">Abbrechen</button>
     </div>
 </div>
+
+<!-- AUDIO ELEMENT -->
 <audio id="countdownAudio" preload="auto">
     <source src="countdown.mp3" type="audio/mpeg">
 </audio>
+
+<!-- SCRIPTS & FIREBASE LOGIK -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, signInAnonymously, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
     const firebaseConfig = {
         apiKey: "AIzaSyCrLhxe9KeHM5DW96K8SfR9NNzXz1kpa1k",
         authDomain: "yasin-df29e.firebaseapp.com",
@@ -471,36 +513,55 @@ h1{
         appId: "1:606699184015:web:02b5bd8b73b0708c4735fa",
         measurementId: "G-18KSH8RRDZ"
     };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+
+    // Firebase Initialisierung mit robuster Fehlerbehandlung
+    let app, db, auth;
+    try {
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+    } catch (error) {
+        console.error("Fehler bei der Firebase-Initialisierung:", error);
+    }
+
     let chatUser = localStorage.getItem("yasin_chat_username") || "";
     let currentUid = null;
     let isOwner = false;
     let heartbeatInterval = null;
     const OWNER_UID = "p952EuvWWFVkJALp1666OkRXuXC2";
     let lastChatDocs = [];
-    signInAnonymously(auth).catch(err => console.error("Anonym Auth Fehler:", err));
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUid = user.uid;
-            startGuestHeartbeat();
-        }
-    });
+
+    // Anonyme Anmeldung für Gäste ausführen
+    if (auth) {
+        signInAnonymously(auth).catch(err => console.error("Anonym Auth Fehler:", err));
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUid = user.uid;
+                startGuestHeartbeat();
+            }
+        });
+    }
+
+    // Chat Schublade umschalten (Toggle mit ARIA-Attributen für Barrierefreiheit)
     const chatWidget = document.getElementById("chatWidget");
     const chatLauncher = document.getElementById("chatLauncherBtn");
+    
     chatLauncher.addEventListener("click", () => {
-        const zu = chatWidget.classList.contains("collapsed");
+        const isCollapsed = chatWidget.classList.contains("collapsed");
         chatWidget.classList.toggle("collapsed");
-        const offen = !chatWidget.classList.contains("collapsed");
-        chatWidget.setAttribute("aria-hidden", offen ? "false" : "true");
-        chatLauncher.setAttribute("aria-expanded", offen ? "true" : "false");
-        if (offen) {
+        const isOpen = !chatWidget.classList.contains("collapsed");
+        
+        chatWidget.setAttribute("aria-hidden", isOpen ? "false" : "true");
+        chatLauncher.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        
+        if (isOpen) {
             const list = document.getElementById("messagesList");
             list.scrollTop = list.scrollHeight;
             if (chatUser) document.getElementById("messageInput").focus();
         }
     });
+
+    // EASTER EGG: Kaffeetasse / Countdown Song mit sanftem Fade-In/Out
     window.playFinalCountdown = function() {
         const audio = document.getElementById("countdownAudio");
         if (!audio.paused) return;
@@ -526,33 +587,42 @@ h1{
                     }
                 }, 100);
             }, 15000);
-        }).catch(() => {});
+        }).catch((e) => {
+            console.log("Audio-Wiedergabe blockiert oder Fehler:", e);
+        });
     };
+
+    // Hilfsfunktion zur Bereinigung von Benutzernamen (XSS-Schutz)
     function sanitizeName(name) {
         return name.replace(/[^a-zA-Z0-9äöüÄÖÜß _-]/g, "").trim().substring(0, 16);
     }
+
+    // YouTube URL Erkennung (unterstützt normale Videos und Shorts)
     function getYouTubeEmbedUrl(text) {
         const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([^#&?\s\/]{11})/;
         const match = text.match(regExp);
         return match ? `https://www.youtube.com/embed/${match[1]}` : null;
     }
+
     document.addEventListener("DOMContentLoaded", () => {
         updateUserLabel();
         if (!chatUser && !isOwner) document.getElementById("nameModal").classList.remove("hidden");
-        const msgInput = document.getElementById("messageInput");
-        if (msgInput) msgInput.addEventListener("input", window.handleTypingEvent);
     });
+
+    // Bereinigung von Timern beim Verlassen (Memory Leak Schutz)
     window.handleOwnerLogout = async function() {
         if (heartbeatInterval) clearInterval(heartbeatInterval);
-        if (typingTimeout) clearTimeout(typingTimeout);
         isOwner = false;
         try {
-            await setDoc(doc(db, "presence", "owner"), { lastActive: new Date(0) }, { merge: true });
+            if (db) await setDoc(doc(db, "presence", "owner"), { lastActive: new Date(0) }, { merge: true });
         } catch (e) {}
     };
+
+    // Heartbeat für Gäste (Online-Status Aktualisierung)
     function startGuestHeartbeat() {
-        if (!currentUid) return;
+        if (!currentUid || !db) return;
         if (heartbeatInterval) clearInterval(heartbeatInterval);
+        
         async function sendHB() {
             if (isOwner) return;
             try {
@@ -560,22 +630,29 @@ h1{
                     user: chatUser || "Gast",
                     lastActive: serverTimestamp()
                 }, { merge: true });
-            } catch (e) {}
+            } catch (e) {
+                console.error("Gast Heartbeat Fehler:", e);
+            }
         }
         sendHB();
         heartbeatInterval = setInterval(sendHB, 30000);
     }
+
+    // Admin / Owner Login Trigger öffnen
     window.checkOwnerLoginTrigger = function() {
         document.getElementById("nameModal").classList.add("hidden");
         document.getElementById("ownerLoginError").textContent = "";
         document.getElementById("ownerLoginModal").classList.remove("hidden");
         document.getElementById("ownerEmailInput").focus();
     };
+
+    // Owner Login Ausführung mit Sicherheitsprüfung
     window.executeOwnerLogin = async function() {
         const email = document.getElementById("ownerEmailInput").value.trim();
         const pass = document.getElementById("ownerPassInput").value;
         const errEl = document.getElementById("ownerLoginError");
         errEl.textContent = "";
+        
         if (!email || !pass) {
             errEl.textContent = "E-Mail und Passwort eingeben.";
             return;
@@ -599,6 +676,8 @@ h1{
             errEl.textContent = "Login fehlgeschlagen. E-Mail oder Passwort prüfen.";
         }
     };
+
+    // Heartbeat für den Owner (Präsenzdokument)
     function startOwnerHeartbeat() {
         if (heartbeatInterval) clearInterval(heartbeatInterval);
         async function sendOwnerHB() {
@@ -612,23 +691,32 @@ h1{
         sendOwnerHB();
         heartbeatInterval = setInterval(sendOwnerHB, 30000);
     }
+
     window.addEventListener("beforeunload", () => {
-        if (currentUid && !isOwner) deleteDoc(doc(db, "onlineUsers", currentUid)).catch(() => {});
+        if (currentUid && !isOwner && db) {
+            deleteDoc(doc(db, "onlineUsers", currentUid)).catch(() => {});
+        }
     });
-    onSnapshot(doc(db, "presence", "owner"), (docSnap) => {
-        const statusText = document.getElementById("ownerStatusText");
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            if (data.lastActive && typeof data.lastActive.toDate === "function") {
-                const diff = Date.now() - data.lastActive.toDate().getTime();
-                if (diff < 75000) {
-                    statusText.innerHTML = `<span class="dot green"></span>Yasin Dev · online · am Werkeln`;
-                    return;
+
+    // Live-Lauscher für den Owner-Status auf der Karte
+    if (db) {
+        onSnapshot(doc(db, "presence", "owner"), (docSnap) => {
+            const statusText = document.getElementById("ownerStatusText");
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.lastActive && typeof data.lastActive.toDate === "function") {
+                    const diff = Date.now() - data.lastActive.toDate().getTime();
+                    if (diff < 75000) {
+                        statusText.innerHTML = `<span class="dot green"></span>Yasin Dev · online · am Werkeln`;
+                        return;
+                    }
                 }
             }
-        }
-        statusText.innerHTML = `<span class="dot amber"></span>Yasin · Kaffeepause`;
-    });
+            statusText.innerHTML = `<span class="dot amber"></span>Yasin · Kaffeepause`;
+        }, (err) => console.error("Presence Error:", err));
+    }
+
+    // Nachricht über Soft-Delete (Twitch-Style) moderieren
     window.deleteMessage = async function(msgId) {
         try {
             await updateDoc(doc(db, "chatMessages", msgId), { text: "Nachricht gelöscht", deleted: true });
@@ -637,12 +725,15 @@ h1{
             console.error("Moderations-Fehler:", e);
         }
     };
+
     function showToast(text) {
         const toast = document.getElementById("toastNotification");
         toast.textContent = text;
         toast.classList.add("show");
         setTimeout(() => toast.classList.remove("show"), 2500);
     }
+
+    // Nachrichten in den DOM rendern (Sicher mit textContent gegen XSS)
     function renderMessages(docs) {
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
@@ -653,11 +744,13 @@ h1{
             let timeString = data.createdAt && data.createdAt.toDate
                 ? data.createdAt.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                 : "gerade eben";
+            
             const msgHeader = document.createElement("div");
             msgHeader.className = "msg-header";
             const boldUser = document.createElement("strong");
             boldUser.textContent = (data.user || "Gast") + ": ";
             msgHeader.appendChild(boldUser);
+            
             if (isOwner && !data.deleted) {
                 const delBtn = document.createElement("button");
                 delBtn.className = "delete-btn";
@@ -667,6 +760,7 @@ h1{
                 msgHeader.appendChild(delBtn);
             }
             div.appendChild(msgHeader);
+            
             if (data.deleted) {
                 const deletedSpan = document.createElement("span");
                 deletedSpan.style.color = "#64748b";
@@ -677,6 +771,7 @@ h1{
                 const textNode = document.createElement("span");
                 textNode.textContent = data.text || "";
                 div.appendChild(textNode);
+                
                 const ytUrl = getYouTubeEmbedUrl(data.text || "");
                 if (ytUrl) {
                     const iframe = document.createElement("iframe");
@@ -686,6 +781,7 @@ h1{
                     iframe.style.borderRadius = "8px";
                     iframe.style.marginTop = "8px";
                     iframe.style.border = "none";
+                    iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-presentation";
                     iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
                     iframe.allowFullscreen = true;
                     div.appendChild(iframe);
@@ -699,29 +795,38 @@ h1{
         });
         list.scrollTop = list.scrollHeight;
     }
-    const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "desc"), limit(50));
-    onSnapshot(chatQuery, (snapshot) => {
-        const docs = [];
-        snapshot.forEach(docSnap => docs.push(docSnap));
-        docs.reverse();
-        lastChatDocs = docs;
-        renderMessages(docs);
-    });
-    onSnapshot(query(collection(db, "onlineUsers")), (snapshot) => {
-        const now = Date.now();
-        let activeCount = 0;
-        snapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            if (data.lastActive && typeof data.lastActive.toDate === "function") {
-                if (now - data.lastActive.toDate().getTime() < 45000) activeCount++;
-            }
-        });
-        document.getElementById("visitorCountLabel").textContent = activeCount > 0 ? `${activeCount} online` : "Niemand online";
-    });
+
+    // Firestore Realtime Listener für Nachrichten
+    if (db) {
+        const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "desc"), limit(50));
+        onSnapshot(chatQuery, (snapshot) => {
+            const docs = [];
+            snapshot.forEach(docSnap => docs.push(docSnap));
+            docs.reverse();
+            lastChatDocs = docs;
+            renderMessages(docs);
+        }, (error) => console.error("Chat Query Error:", error));
+
+        // Firestore Realtime Listener für Besucherzähler
+        onSnapshot(query(collection(db, "onlineUsers")), (snapshot) => {
+            const now = Date.now();
+            let activeCount = 0;
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                if (data.lastActive && typeof data.lastActive.toDate === "function") {
+                    if (now - data.lastActive.toDate().getTime() < 45000) activeCount++;
+                }
+            });
+            document.getElementById("visitorCountLabel").textContent = activeCount > 0 ? `${activeCount} online` : "Niemand online";
+        }, (error) => console.error("Online Users Error:", error));
+    }
+
+    // Benutzerlabel aktualisieren
     function updateUserLabel() {
         const label = document.getElementById("userNameLabel");
         label.textContent = isOwner ? "⭐ Yasin Dev" : (chatUser ? "👤 " + chatUser + " (ändern)" : "👤 Name festlegen");
     }
+
     window.checkNameBeforeWriting = function() {
         if (isOwner) return;
         if (!chatUser) {
@@ -729,12 +834,14 @@ h1{
             document.getElementById("popupNameInput").focus();
         }
     };
+
     window.requestNameChange = function() {
         if (isOwner) return;
         document.getElementById("nameModal").classList.remove("hidden");
         document.getElementById("popupNameInput").value = chatUser || "";
         document.getElementById("popupNameInput").focus();
     };
+
     window.saveNameFromPopup = function() {
         const val = sanitizeName(document.getElementById("popupNameInput").value);
         const errEl = document.getElementById("nameError");
@@ -752,6 +859,7 @@ h1{
         updateUserLabel();
         document.getElementById("messageInput").focus();
     };
+
     window.checkNameAndSend = function() {
         if (isOwner) {
             sendMessage();
@@ -763,6 +871,8 @@ h1{
         }
         sendMessage();
     };
+
+    // Nachricht in Firestore schreiben
     async function sendMessage() {
         const input = document.getElementById("messageInput");
         const text = input.value.trim();
@@ -780,10 +890,10 @@ h1{
             console.error("Sende-Fehler:", e);
         }
     }
+
     window.handleKeyPress = function(e) {
         if (e.key === "Enter") checkNameAndSend();
     };
-    window.handleTypingEvent = function() {};
 </script>
 </body>
 </html>
