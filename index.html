@@ -296,26 +296,44 @@ h1{
 }
 .delete-btn:hover { color: #ef4444; }
 
-/* Toast Benachrichtigung */
+/* ==========================================
+   MSN WACKEL-ANIMATION (GESAMTER BILDSCHIRM)
+   ========================================== */
+@keyframes slideInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes msnShakeWindow {
+  0%, 100% { transform: translate(0, 0); }
+  15%, 45%, 75% { transform: translate(-10px, -6px); }
+  30%, 60%, 90% { transform: translate(10px, 6px); }
+}
+
+.shake-screen {
+  animation: msnShakeWindow 0.4s ease-in-out !important;
+}
+
 .toast-notification {
   position: fixed;
   bottom: 85px;
   left: 20px;
   background: #1e293b;
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #f87171;
-  padding: 8px 14px;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  padding: 10px 16px;
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  z-index: 1050;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.2s ease;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  z-index: 2500;
+  display: none;
   pointer-events: none;
 }
-.toast-notification.show { opacity: 1; transform: translateY(0); }
+.toast-notification.show {
+  display: block;
+  animation: slideInUp 0.3s ease-in-out;
+}
 
 .chat-input-area {
   display: flex;
@@ -323,7 +341,23 @@ h1{
   background: rgba(30, 41, 59, 0.9);
   gap: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  align-items: center;
 }
+
+.nudge-btn {
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: var(--cyan);
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+.nudge-btn:hover {
+  background: rgba(56, 189, 248, 0.25);
+}
+
 .chat-input-area input[type="text"] {
   flex: 1;
   background: rgba(15, 23, 42, 0.9);
@@ -411,7 +445,7 @@ h1{
 </head>
 <body>
 
-<!-- HAUPTSEITE / WARTUNGS-CONTAINER -->
+<!-- WARTUNGS-CONTAINER -->
 <main class="shell">
 <section class="card" aria-labelledby="title">
   <div class="hero-icon" onclick="playFinalCountdown()" title="Klick für The Final Countdown">
@@ -453,7 +487,7 @@ h1{
 </main>
 
 <!-- TOAST BENACHRICHTIGUNG -->
-<div class="toast-notification" id="toastNotification" aria-live="polite">Nachricht gelöscht</div>
+<div id="toastNotification" class="toast-notification" aria-live="polite"></div>
 
 <!-- CHAT LAUNCHER & SCHUBLADE -->
 <button class="chat-launcher" id="chatLauncherBtn" type="button" aria-expanded="false" aria-controls="chatWidget">💬 Schreib mir</button>
@@ -462,10 +496,11 @@ h1{
         <span>💬 Schreib mir</span>
         <span class="change-name" id="userNameLabel" onclick="requestNameChange()" title="Namen ändern"></span>
     </div>
-    <!-- Chat-Nachrichtenbereich mit ARIA live region für Screenreader -->
     <div class="chat-messages" id="messagesList" aria-live="polite"></div>
     <div id="typingIndicator" style="font-size: 11px; color: #94a3b8; padding: 4px 12px; font-style: italic; min-height: 20px; background: rgba(15, 23, 42, 0.4);"></div>
     <div class="chat-input-area">
+        <!-- MSN Anstups-Button -->
+        <button type="button" class="nudge-btn" onclick="sendNudgeAction()" title="Anstupsen (Bildschirm wackeln lassen)">👋</button>
         <input type="text" id="messageInput" maxlength="500" placeholder="Nachricht schreiben..." onfocus="checkNameBeforeWriting()" onkeypress="handleKeyPress(event)">
         <button class="send-btn" onclick="checkNameAndSend()">Senden</button>
     </div>
@@ -498,7 +533,7 @@ h1{
     <source src="countdown.mp3" type="audio/mpeg">
 </audio>
 
-<!-- SCRIPTS & FIREBASE LOGIK -->
+<!-- FIREBASE & LOGIK -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -514,14 +549,13 @@ h1{
         measurementId: "G-18KSH8RRDZ"
     };
 
-    // Firebase Initialisierung mit robuster Fehlerbehandlung
     let app, db, auth;
     try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
     } catch (error) {
-        console.error("Fehler bei der Firebase-Initialisierung:", error);
+        console.error("Firebase Initialisierungsfehler:", error);
     }
 
     let chatUser = localStorage.getItem("yasin_chat_username") || "";
@@ -531,7 +565,6 @@ h1{
     const OWNER_UID = "p952EuvWWFVkJALp1666OkRXuXC2";
     let lastChatDocs = [];
 
-    // Anonyme Anmeldung für Gäste ausführen
     if (auth) {
         signInAnonymously(auth).catch(err => console.error("Anonym Auth Fehler:", err));
         onAuthStateChanged(auth, (user) => {
@@ -542,7 +575,6 @@ h1{
         });
     }
 
-    // Chat Schublade umschalten (Toggle mit ARIA-Attributen für Barrierefreiheit)
     const chatWidget = document.getElementById("chatWidget");
     const chatLauncher = document.getElementById("chatLauncherBtn");
     
@@ -557,11 +589,14 @@ h1{
         if (isOpen) {
             const list = document.getElementById("messagesList");
             list.scrollTop = list.scrollHeight;
-            if (chatUser) document.getElementById("messageInput").focus();
+            if (chatUser || isOwner) {
+                document.getElementById("messageInput").focus();
+            } else {
+                checkNameBeforeWriting();
+            }
         }
     });
 
-    // EASTER EGG: Kaffeetasse / Countdown Song mit sanftem Fade-In/Out
     window.playFinalCountdown = function() {
         const audio = document.getElementById("countdownAudio");
         if (!audio.paused) return;
@@ -588,16 +623,14 @@ h1{
                 }, 100);
             }, 15000);
         }).catch((e) => {
-            console.log("Audio-Wiedergabe blockiert oder Fehler:", e);
+            console.log("Audio blockiert:", e);
         });
     };
 
-    // Hilfsfunktion zur Bereinigung von Benutzernamen (XSS-Schutz)
     function sanitizeName(name) {
         return name.replace(/[^a-zA-Z0-9äöüÄÖÜß _-]/g, "").trim().substring(0, 16);
     }
 
-    // YouTube URL Erkennung (unterstützt normale Videos und Shorts)
     function getYouTubeEmbedUrl(text) {
         const regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([^#&?\s\/]{11})/;
         const match = text.match(regExp);
@@ -609,7 +642,6 @@ h1{
         if (!chatUser && !isOwner) document.getElementById("nameModal").classList.remove("hidden");
     });
 
-    // Bereinigung von Timern beim Verlassen (Memory Leak Schutz)
     window.handleOwnerLogout = async function() {
         if (heartbeatInterval) clearInterval(heartbeatInterval);
         isOwner = false;
@@ -618,11 +650,9 @@ h1{
         } catch (e) {}
     };
 
-    // Heartbeat für Gäste (Online-Status Aktualisierung)
     function startGuestHeartbeat() {
         if (!currentUid || !db) return;
         if (heartbeatInterval) clearInterval(heartbeatInterval);
-        
         async function sendHB() {
             if (isOwner) return;
             try {
@@ -630,15 +660,12 @@ h1{
                     user: chatUser || "Gast",
                     lastActive: serverTimestamp()
                 }, { merge: true });
-            } catch (e) {
-                console.error("Gast Heartbeat Fehler:", e);
-            }
+            } catch (e) {}
         }
         sendHB();
         heartbeatInterval = setInterval(sendHB, 30000);
     }
 
-    // Admin / Owner Login Trigger öffnen
     window.checkOwnerLoginTrigger = function() {
         document.getElementById("nameModal").classList.add("hidden");
         document.getElementById("ownerLoginError").textContent = "";
@@ -646,7 +673,6 @@ h1{
         document.getElementById("ownerEmailInput").focus();
     };
 
-    // Owner Login Ausführung mit Sicherheitsprüfung
     window.executeOwnerLogin = async function() {
         const email = document.getElementById("ownerEmailInput").value.trim();
         const pass = document.getElementById("ownerPassInput").value;
@@ -672,12 +698,12 @@ h1{
             updateUserLabel();
             startOwnerHeartbeat();
             renderMessages(lastChatDocs);
+            window.showToast("⭐ Als Yasin Dev angemeldet!");
         } catch (e) {
-            errEl.textContent = "Login fehlgeschlagen. E-Mail oder Passwort prüfen.";
+            errEl.textContent = "Login fehlgeschlagen.";
         }
     };
 
-    // Heartbeat für den Owner (Präsenzdokument)
     function startOwnerHeartbeat() {
         if (heartbeatInterval) clearInterval(heartbeatInterval);
         async function sendOwnerHB() {
@@ -698,7 +724,6 @@ h1{
         }
     });
 
-    // Live-Lauscher für den Owner-Status auf der Karte
     if (db) {
         onSnapshot(doc(db, "presence", "owner"), (docSnap) => {
             const statusText = document.getElementById("ownerStatusText");
@@ -713,27 +738,64 @@ h1{
                 }
             }
             statusText.innerHTML = `<span class="dot amber"></span>Yasin · Kaffeepause`;
-        }, (err) => console.error("Presence Error:", err));
+        });
     }
 
-    // Nachricht über Soft-Delete (Twitch-Style) moderieren
+    /* ==========================================
+       TOAST & MSN NUDGE LOGIK (Vollbild-Shake)
+       ========================================== */
+    window.showToast = function(text, isError = false) {
+        const toast = document.getElementById("toastNotification");
+        if (!toast) return;
+        toast.textContent = text;
+        if (isError) {
+            toast.style.borderColor = "var(--red)";
+            toast.style.color = "var(--red)";
+        } else {
+            toast.style.borderColor = "rgba(56, 189, 248, 0.4)";
+            toast.style.color = "var(--cyan)";
+        }
+        toast.classList.add("show");
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 3000);
+    };
+
+    // Wackelt jetzt den GESAMTEN Bildschirm (Body) auf PC und Smartphones
+    window.triggerNudge = function(senderName) {
+        const target = document.body;
+        if (!target) return;
+        
+        target.classList.remove("shake-screen");
+        void target.offsetWidth; // Erzwingt Neuladen der Animation für iOS & Android
+        
+        target.classList.add("shake-screen");
+        window.showToast("👋 " + senderName + " hat angeklopft und den Bildschirm gewackelt!");
+        
+        setTimeout(() => {
+            target.classList.remove("shake-screen");
+        }, 400);
+    };
+
+    window.sendNudgeAction = function() {
+        if (!chatUser && !isOwner) {
+            window.showToast("Bitte zuerst Namen festlegen!", true);
+            checkNameBeforeWriting();
+            return;
+        }
+        const sender = isOwner ? "Yasin Dev" : chatUser;
+        triggerNudge(sender);
+    };
+
     window.deleteMessage = async function(msgId) {
         try {
             await updateDoc(doc(db, "chatMessages", msgId), { text: "Nachricht gelöscht", deleted: true });
-            showToast("Nachricht gelöscht");
+            window.showToast("Nachricht gelöscht");
         } catch (e) {
             console.error("Moderations-Fehler:", e);
         }
     };
 
-    function showToast(text) {
-        const toast = document.getElementById("toastNotification");
-        toast.textContent = text;
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 2500);
-    }
-
-    // Nachrichten in den DOM rendern (Sicher mit textContent gegen XSS)
     function renderMessages(docs) {
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
@@ -796,7 +858,6 @@ h1{
         list.scrollTop = list.scrollHeight;
     }
 
-    // Firestore Realtime Listener für Nachrichten
     if (db) {
         const chatQuery = query(collection(db, "chatMessages"), orderBy("createdAt", "desc"), limit(50));
         onSnapshot(chatQuery, (snapshot) => {
@@ -805,9 +866,8 @@ h1{
             docs.reverse();
             lastChatDocs = docs;
             renderMessages(docs);
-        }, (error) => console.error("Chat Query Error:", error));
+        });
 
-        // Firestore Realtime Listener für Besucherzähler
         onSnapshot(query(collection(db, "onlineUsers")), (snapshot) => {
             const now = Date.now();
             let activeCount = 0;
@@ -818,10 +878,9 @@ h1{
                 }
             });
             document.getElementById("visitorCountLabel").textContent = activeCount > 0 ? `${activeCount} online` : "Niemand online";
-        }, (error) => console.error("Online Users Error:", error));
+        });
     }
 
-    // Benutzerlabel aktualisieren
     function updateUserLabel() {
         const label = document.getElementById("userNameLabel");
         label.textContent = isOwner ? "⭐ Yasin Dev" : (chatUser ? "👤 " + chatUser + " (ändern)" : "👤 Name festlegen");
@@ -830,6 +889,7 @@ h1{
     window.checkNameBeforeWriting = function() {
         if (isOwner) return;
         if (!chatUser) {
+            window.showToast("Bitte lege zuerst einen Namen fest!", true);
             document.getElementById("nameModal").classList.remove("hidden");
             document.getElementById("popupNameInput").focus();
         }
@@ -857,6 +917,7 @@ h1{
         localStorage.setItem("yasin_chat_username", chatUser);
         document.getElementById("nameModal").classList.add("hidden");
         updateUserLabel();
+        window.showToast("Name gespeichert: " + chatUser);
         document.getElementById("messageInput").focus();
     };
 
@@ -866,13 +927,12 @@ h1{
             return;
         }
         if (!chatUser) {
-            checkNameBeforeWriting();
+            window.checkNameBeforeWriting();
             return;
         }
         sendMessage();
     };
 
-    // Nachricht in Firestore schreiben
     async function sendMessage() {
         const input = document.getElementById("messageInput");
         const text = input.value.trim();
@@ -886,8 +946,10 @@ h1{
                 deleted: false
             });
             input.value = "";
+            window.showToast("Nachricht gesendet!");
         } catch (e) {
             console.error("Sende-Fehler:", e);
+            window.showToast("Senden fehlgeschlagen! Verbindung prüfen.", true);
         }
     }
 
