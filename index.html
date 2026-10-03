@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#070b14">
-<title>Yasin Özer • Wartungsarbeiten</title>
+<title>Wartungsarbeiten</title>
 <meta name="description" content="Persönliche Wartungsseite und Live-Pinnwand von Yasin Özer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
@@ -47,7 +47,6 @@ body{
   position: relative;
 }
 
-/* Hintergrund-Glow-Effekte mit sanfter Animation */
 body:before,body:after{
   content:"";position:fixed;border-radius:50%;filter:blur(70px);
   pointer-events:none;opacity:.28;animation:float 10s ease-in-out infinite alternate;
@@ -77,7 +76,6 @@ body:after{width:260px;height:260px;background:#6366f1;right:-120px;bottom:-120p
   backdrop-filter:blur(24px);
 }
 
-/* Kaffeetasse / Easter-Egg Animation */
 .hero-icon{
   width:110px;height:110px;
   margin:0 auto 16px;
@@ -297,7 +295,7 @@ h1{
 .delete-btn:hover { color: #ef4444; }
 
 /* ==========================================
-   MSN WACKEL-ANIMATION (GESAMTER BILDSCHIRM)
+   MSN WACKEL-ANIMATION (VOLLBILD)
    ========================================== */
 @keyframes slideInUp {
   from { transform: translateY(20px); opacity: 0; }
@@ -533,7 +531,7 @@ h1{
     <source src="countdown.mp3" type="audio/mpeg">
 </audio>
 
-<!-- FIREBASE & LOGIK -->
+<!-- FIREBASE & LOGIK (MIT ECHTEM NETWORK-NUDGE) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -564,6 +562,7 @@ h1{
     let heartbeatInterval = null;
     const OWNER_UID = "p952EuvWWFVkJALp1666OkRXuXC2";
     let lastChatDocs = [];
+    let lastSeenNudgeTime = Date.now(); // Verhindert, dass alte Anstupser beim Laden sofort zünden
 
     if (auth) {
         signInAnonymously(auth).catch(err => console.error("Anonym Auth Fehler:", err));
@@ -742,7 +741,7 @@ h1{
     }
 
     /* ==========================================
-       TOAST & MSN NUDGE LOGIK (Vollbild-Shake)
+       TOAST & MSN NUDGE LOGIK (FIREBASE REALTIME)
        ========================================== */
     window.showToast = function(text, isError = false) {
         const toast = document.getElementById("toastNotification");
@@ -761,31 +760,65 @@ h1{
         }, 3000);
     };
 
-    // Wackelt jetzt den GESAMTEN Bildschirm (Body) auf PC und Smartphones
-    window.triggerNudge = function(senderName) {
+    // Lokale Ausführung des Vollbild-Shakes bei einem echten Anstupser
+    function executeLocalShake(senderName) {
         const target = document.body;
         if (!target) return;
         
         target.classList.remove("shake-screen");
-        void target.offsetWidth; // Erzwingt Neuladen der Animation für iOS & Android
+        void target.offsetWidth; // Erzwingt Reflow für iOS / Android
         
         target.classList.add("shake-screen");
-        window.showToast("👋 " + senderName + " hat angeklopft und den Bildschirm gewackelt!");
+        window.showToast("👋 " + senderName + " hat dich angestupst!");
         
         setTimeout(() => {
             target.classList.remove("shake-screen");
         }, 400);
-    };
+    }
 
-    window.sendNudgeAction = function() {
+    // 1. Wenn du den Button klickst, senden wir das Signal an Firebase
+    window.sendNudgeAction = async function() {
         if (!chatUser && !isOwner) {
             window.showToast("Bitte zuerst Namen festlegen!", true);
             checkNameBeforeWriting();
             return;
         }
         const sender = isOwner ? "Yasin Dev" : chatUser;
-        triggerNudge(sender);
+        try {
+            await addDoc(collection(db, "nudges"), {
+                sender: sender,
+                createdAt: serverTimestamp(),
+                senderUid: currentUid
+            });
+            window.showToast("👋 Du hast jemanden angestupst!");
+        } catch (e) {
+            console.error("Anstups-Fehler:", e);
+            window.showToast("Anstupsen fehlgeschlagen.", true);
+        }
     };
+
+    // 2. Wir lauschen in Echtzeit auf neue Anstupser von anderen
+    if (db) {
+        const nudgeQuery = query(collection(db, "nudges"), orderBy("createdAt", "desc"), limit(1));
+        onSnapshot(nudgeQuery, (snapshot) => {
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                if (data.createdAt && typeof data.createdAt.toDate === "function") {
+                    const nudgeTime = data.createdAt.toDate().getTime();
+                    // Wenn der Anstupser frisch ist (unter 6 Sek. alt) und neuer als unsere letzte Zeit
+                    if (nudgeTime > lastSeenNudgeTime && (Date.now() - nudgeTime < 6000)) {
+                        lastSeenNudgeTime = nudgeTime;
+                        // Nur wackeln, wenn WIR NICHT selbst der Absender waren!
+                        if (data.senderUid !== currentUid) {
+                            executeLocalShake(data.sender);
+                        }
+                    } else if (nudgeTime > lastSeenNudgeTime) {
+                        lastSeenNudgeTime = nudgeTime; // Nur Aktualisierung beim Laden
+                    }
+                }
+            });
+        });
+    }
 
     window.deleteMessage = async function(msgId) {
         try {
