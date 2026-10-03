@@ -602,6 +602,34 @@ h1{
     let lastChatDocs = [];
     let lastSeenNudgeTime = Date.now();
 
+    /* ==========================================
+       BULLETPROOF AUDIO UNLOCKER (FÜR iOS & CO.)
+       ========================================== */
+    let audioUnlocked = false;
+    function unlockAllAudio() {
+        if (audioUnlocked) return;
+        const audios = [
+            document.getElementById("countdownAudio"),
+            document.getElementById("nudgeAudio"),
+            document.getElementById("knockAudio")
+        ];
+        audios.forEach(audio => {
+            if (audio) {
+                audio.muted = true;
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audio.muted = false;
+                }).catch(() => {});
+            }
+        });
+        audioUnlocked = true;
+        document.removeEventListener("click", unlockAllAudio);
+        document.removeEventListener("touchstart", unlockAllAudio);
+    }
+    document.addEventListener("click", unlockAllAudio, { once: true });
+    document.addEventListener("touchstart", unlockAllAudio, { once: true });
+
     if (auth) {
         signInAnonymously(auth).catch(err => console.error("Anonym Auth Fehler:", err));
         onAuthStateChanged(auth, (user) => {
@@ -616,6 +644,7 @@ h1{
     const chatLauncher = document.getElementById("chatLauncherBtn");
     
     chatLauncher.addEventListener("click", () => {
+        unlockAllAudio(); // Extra Trigger beim Öffnen des Chats
         const isCollapsed = chatWidget.classList.contains("collapsed");
         chatWidget.classList.toggle("collapsed");
         const isOpen = !chatWidget.classList.contains("collapsed");
@@ -635,6 +664,7 @@ h1{
     });
 
     window.playFinalCountdown = function() {
+        unlockAllAudio();
         const audio = document.getElementById("countdownAudio");
         if (!audio.paused) return;
         audio.volume = 0.0;
@@ -779,7 +809,7 @@ h1{
     }
 
     /* ==========================================
-       TOAST, GETRENNTE SOUND- & KLOPF-LOGIK
+       TOAST, SHAKER & KLOPF-LOGIK
        ========================================== */
     window.showToast = function(text, isError = false) {
         const toast = document.getElementById("toastNotification");
@@ -798,7 +828,6 @@ h1{
         }, 3000);
     };
 
-    // Robuste Shake-Funktion für den Container (.shell)
     function triggerContainerShake() {
         const shell = document.querySelector(".shell");
         if (!shell) return;
@@ -812,10 +841,11 @@ h1{
 
     // 1. Reiner Shaker (nutzt nudge.mp3 + wackelt)
     function executeLocalShaker(senderName) {
+        unlockAllAudio();
         const nudgeAudio = document.getElementById("nudgeAudio");
         if (nudgeAudio) {
             nudgeAudio.currentTime = 0;
-            nudgeAudio.play().catch(e => console.log("Audio blockiert:", e));
+            nudgeAudio.play().catch(e => console.log("Audio blockiert auf iOS:", e));
         }
 
         triggerContainerShake();
@@ -824,17 +854,16 @@ h1{
 
     // 2. Wuchtiges Knöchel-Klopfen (nutzt knock_sound.mp3 + GIF, OHNE Wackeln)
     function executeLocalKnock(senderName) {
+        unlockAllAudio();
         const overlay = document.getElementById("nudgeOverlay");
         const gifImg = document.getElementById("nudgeGifImg");
         
-        // Exklusiven Knock-Sound abspielen
         const knockAudio = document.getElementById("knockAudio");
         if (knockAudio) {
             knockAudio.currentTime = 0;
-            knockAudio.play().catch(e => console.log("Audio blockiert:", e));
+            knockAudio.play().catch(e => console.log("Audio blockiert auf iOS:", e));
         }
 
-        // GIF-Reset & exakt getimtes Fade-In/Out
         if (overlay && gifImg) {
             const cleanSrc = gifImg.src.split('?')[0];
             gifImg.src = cleanSrc + '?t=' + Date.now();
@@ -849,8 +878,8 @@ h1{
         window.showToast("✊ " + senderName + " hat gegen den Monitor geklopft!");
     }
 
-    // Aktionen abschicken an Firebase
     window.sendShakerAction = async function() {
+        unlockAllAudio();
         if (!chatUser && !isOwner) {
             window.showToast("Bitte zuerst Namen festlegen!", true);
             checkNameBeforeWriting();
@@ -871,6 +900,7 @@ h1{
     };
 
     window.sendKnockAction = async function() {
+        unlockAllAudio();
         if (!chatUser && !isOwner) {
             window.showToast("Bitte zuerst Namen festlegen!", true);
             checkNameBeforeWriting();
@@ -890,7 +920,6 @@ h1{
         }
     };
 
-    // Auf Live-Signale von anderen lauschen
     if (db) {
         const nudgeQuery = query(collection(db, "nudges"), orderBy("createdAt", "desc"), limit(1));
         onSnapshot(nudgeQuery, (snapshot) => {
@@ -1013,6 +1042,7 @@ h1{
     }
 
     window.checkNameBeforeWriting = function() {
+        unlockAllAudio();
         if (isOwner) return;
         if (!chatUser) {
             window.showToast("Bitte lege zuerst einen Namen fest!", true);
@@ -1022,6 +1052,7 @@ h1{
     };
 
     window.requestNameChange = function() {
+        unlockAllAudio();
         if (isOwner) return;
         document.getElementById("nameModal").classList.remove("hidden");
         document.getElementById("popupNameInput").value = chatUser || "";
@@ -1029,6 +1060,7 @@ h1{
     };
 
     window.saveNameFromPopup = function() {
+        unlockAllAudio();
         const val = sanitizeName(document.getElementById("popupNameInput").value);
         const errEl = document.getElementById("nameError");
         if (val.length < 2) {
@@ -1048,6 +1080,7 @@ h1{
     };
 
     window.checkNameAndSend = function() {
+        unlockAllAudio();
         if (isOwner) {
             sendMessage();
             return;
@@ -1060,6 +1093,7 @@ h1{
     };
 
     async function sendMessage() {
+        unlockAllAudio();
         const input = document.getElementById("messageInput");
         const text = input.value.trim();
         if (!text || text.length > 500) return;
