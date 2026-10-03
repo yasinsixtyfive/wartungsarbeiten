@@ -562,6 +562,9 @@ h1{
 <audio id="countdownAudio" preload="auto">
     <source src="countdown.mp3" type="audio/mpeg">
 </audio>
+<audio id="nudgeAudio" preload="auto">
+    <source src="nudge.mp3" type="audio/mpeg">
+</audio>
 <audio id="knockAudio" preload="auto">
     <source src="knock_sound.mp3" type="audio/mpeg">
 </audio>
@@ -776,7 +779,7 @@ h1{
     }
 
     /* ==========================================
-       TOAST, SHAKER & KLOPF-LOGIK
+       TOAST, GETRENNTE SOUND- & KLOPF-LOGIK
        ========================================== */
     window.showToast = function(text, isError = false) {
         const toast = document.getElementById("toastNotification");
@@ -807,24 +810,24 @@ h1{
         }, 500);
     }
 
-    // 1. Reiner Shaker (nur Shaker lässt den Bildschirm wackeln + Sound)
+    // 1. Reiner Shaker (nutzt nudge.mp3 + wackelt)
     function executeLocalShaker(senderName) {
-        const knockAudio = document.getElementById("knockAudio");
-        if (knockAudio) {
-            knockAudio.currentTime = 0;
-            knockAudio.play().catch(e => console.log("Audio blockiert:", e));
+        const nudgeAudio = document.getElementById("nudgeAudio");
+        if (nudgeAudio) {
+            nudgeAudio.currentTime = 0;
+            nudgeAudio.play().catch(e => console.log("Audio blockiert:", e));
         }
 
         triggerContainerShake();
         window.showToast("👋 " + senderName + " hat angestupst!");
     }
 
-    // 2. Wuchtiges Knöchel-Klopfen (GIF + Sound, OHNE Bildschirm-Wackeln)
+    // 2. Wuchtiges Knöchel-Klopfen (nutzt knock_sound.mp3 + GIF, OHNE Wackeln)
     function executeLocalKnock(senderName) {
         const overlay = document.getElementById("nudgeOverlay");
         const gifImg = document.getElementById("nudgeGifImg");
         
-        // Sound abspielen
+        // Exklusiven Knock-Sound abspielen
         const knockAudio = document.getElementById("knockAudio");
         if (knockAudio) {
             knockAudio.currentTime = 0;
